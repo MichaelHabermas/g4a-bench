@@ -2,7 +2,7 @@
 
 This folder is the **home for benchmark results** in the G4A bench repo. It does not hold the specs or challenger repos; it holds what we learn after running teams against those inputs.
 
-Benchmark tooling (to be built) will clone repos from [`g4a-challenger-repos/`](../g4a-challenger-repos/), score them against the week’s materials in [`g4a-specs/`](../g4a-specs/), and **write outputs here**—organized by cohort, then by week, then by team.
+Benchmark tooling (to be built) will clone repos from `[g4a-challenger-repos/](../g4a-challenger-repos/)`, score them against the week’s materials in `[g4a-specs/](../g4a-specs/)`, and **write outputs here**—organized by cohort, then by week, then by team.
 
 ## Why this exists
 
@@ -18,11 +18,13 @@ Agents and humans should treat this README as the contract for what belongs here
 
 ## Relationship to other folders
 
-| Folder | Role |
-|--------|------|
-| [`g4a-specs/`](../g4a-specs/) | **What “good” means** for a week—PRDs, case studies, audit briefs, acceptance themes. The benchmark reads these (not copies of them) to derive checks and scoring dimensions. |
-| [`g4a-challenger-repos/`](../g4a-challenger-repos/) | **What to run**—per-week `REPOS.md` lists team names and Git URLs. Team names in that file are the canonical labels for results. |
-| **`g4a-benchmarks/`** (here) | **What happened**—scores, rankings, logs, repro notes, and any exported evidence from a benchmark run. |
+
+| Folder                                              | Role                                                                                                                                                                          |
+| --------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `[g4a-specs/](../g4a-specs/)`                       | **What “good” means** for a week—PRDs, case studies, audit briefs, acceptance themes. The benchmark reads these (not copies of them) to derive checks and scoring dimensions. |
+| `[g4a-challenger-repos/](../g4a-challenger-repos/)` | **What to run**—per-week `REPOS.md` lists team names and Git URLs. Team names in that file are the canonical labels for results.                                              |
+| `**g4a-benchmarks/`** (here)                        | **What happened**—scores, rankings, logs, repro notes, and any exported evidence from a benchmark run.                                                                        |
+
 
 Specs are the source of truth for intent; challenger repos are the source of truth for *who* was measured; this folder is the source of truth for *outcomes*.
 
@@ -59,16 +61,16 @@ g4a-benchmarks/
 
 Conventions:
 
-- **`{cohort}`** mirrors directory names in `g4a-specs/` and `g4a-challenger-repos/` (e.g. `g4a-c5-2`).
-- **`{team-name}`** must match `REPOS.md` exactly so results join cleanly across reruns.
-- **`rankings.*`** is the human-facing rollup for the week; per-team folders hold detail and reproducibility.
+- `**{cohort}**` mirrors directory names in `g4a-specs/` and `g4a-challenger-repos/` (e.g. `g4a-c5-2`).
+- `**{team-name}**` must match `REPOS.md` exactly so results join cleanly across reruns.
+- `**rankings.***` is the human-facing rollup for the week; per-team folders hold detail and reproducibility.
 - Do not commit secrets, tokens, or full cloned repos—only scores, logs, and redacted artifacts.
 
 ## Lifecycle
 
 1. **Before a run:** specs and `REPOS.md` for the week are finalized in their respective folders.
 2. **During a run:** harness writes per-team outputs under `{cohort}/week-{n}/{team-name}/`.
-3. **After a run:** generate `rankings.*` from aggregated scores; optional week `README.md` records rubric version, spec file hashes or paths, and run metadata.
+3. **After a run:** generate `rankings.`* from aggregated scores; optional week `README.md` records rubric version, spec file hashes or paths, and run metadata.
 4. **When all weeks for a cohort are measured:** each week has its own ranking; any cohort-wide synthesis (leaderboards, trends) should be derived from these week bundles and clearly labeled as composite—not as a replacement for week-specific results.
 
 ## Guidance for agents building the harness
@@ -78,7 +80,7 @@ When implementing or extending benchmark tooling:
 1. **Read specs first.** Parse `g4a-specs/{cohort}/week-{n}/` and encode week-specific checks; do not hard-code week-1 rules globally.
 2. **Read repos second.** Use `g4a-challenger-repos/{cohort}/week-{n}/REPOS.md` as the team list; fail loudly if a listed repo is missing or unreachable.
 3. **Write results only under `g4a-benchmarks/`.** Keep specs and repo lists read-only inputs.
-4. **Make rankings explainable.** Every score in `rankings.*` should trace to a named criterion documented in the week output (or in a generated rubric file).
+4. **Make rankings explainable.** Every score in `rankings.`* should trace to a named criterion documented in the week output (or in a generated rubric file).
 5. **Prefer idempotent reruns.** Re-running a week should overwrite or version that week’s folder predictably (e.g. timestamp in metadata), not scatter files at the repo root.
 6. **Stay cohort-local.** Never merge `g4a-c5-2` results with another cohort’s tree.
 
@@ -86,6 +88,6 @@ When implementing or extending benchmark tooling:
 
 This directory is intentionally sparse until benchmark runs exist. The first populated path should be something like:
 
-`g4a-benchmarks/g4a-c5-2/week-1/` after week 1 is measured against [`g4a-specs/g4a-c5-2/week-1/SPECS.txt`](../g4a-specs/g4a-c5-2/week-1/SPECS.txt) and the teams in [`g4a-challenger-repos/g4a-c5-2/week-1/REPOS.md`](../g4a-challenger-repos/g4a-c5-2/week-1/REPOS.md).
+`g4a-benchmarks/g4a-c5-2/week-1/` after week 1 is measured against `[g4a-specs/g4a-c5-2/week-1/SPECS.txt](../g4a-specs/g4a-c5-2/week-1/SPECS.txt)` and the teams in `[g4a-challenger-repos/g4a-c5-2/week-1/REPOS.md](../g4a-challenger-repos/g4a-c5-2/week-1/REPOS.md)`.
 
 Until then, treat this README as the specification for what will land here and how it should be organized.

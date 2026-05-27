@@ -11,6 +11,7 @@ Team submission repos for this week. Benchmark tooling reads this file to clone 
 
 Add one row per team. Keep team names stable — they label benchmark results.
 
-| Team | Repo |
-|------|------|
-| example-team | <https://github.com/example-team/g4a-c5-2-week-5> |
+| Repo |
+| ------ |
+| <https://github.com/MichaelHabermas/ship-shape> |
+| <https://labs.gauntletai.com/daltondinderman/shipshape> |

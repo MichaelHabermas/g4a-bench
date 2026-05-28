@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>G4A Week 4 Prototype Findings</title>
+  <style>
+    :root {
+      --ink: #171717;
+      --muted: #65615b;
+      --paper: #f7f4ee;
+      --panel: #fffcf6;
+      --line: #d9d1c3;
+      --green: #22745f;
+      --amber: #b36b16;
+      --red: #a13d2d;
+      --blue: #2d5f8f;
+      --shadow: 0 18px 45px rgba(35, 29, 20, .11);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        linear-gradient(90deg, rgba(23,23,23,.035) 1px, transparent 1px) 0 0 / 28px 28px,
+        linear-gradient(rgba(23,23,23,.028) 1px, transparent 1px) 0 0 / 28px 28px,
+        var(--paper);
+      font-family: "Avenir Next", "Gill Sans", Verdana, sans-serif;
+      line-height: 1.45;
+    }
+    main { max-width: 1180px; margin: 0 auto; padding: 44px 24px 64px; }
+    header {
+      display: grid;
+      grid-template-columns: 1.3fr .7fr;
+      gap: 28px;
+      align-items: end;
+      border-bottom: 2px solid var(--ink);
+      padding-bottom: 24px;
+      margin-bottom: 28px;
+    }
+    .eyebrow {
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      color: var(--blue);
+    }
+    h1 {
+      margin: 8px 0 12px;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(38px, 6vw, 76px);
+      line-height: .92;
+      letter-spacing: 0;
+    }
+    .lede { max-width: 760px; color: var(--muted); font-size: 18px; }
+    .verdict {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      padding: 22px;
+    }
+    .verdict strong { display: block; font-size: 34px; }
+    .verdict span { color: var(--muted); }
+    .notice {
+      border: 1px solid #c9b27c;
+      background: #fff4d8;
+      padding: 14px 16px;
+      margin: 0 0 28px;
+      font-weight: 650;
+    }
+    .explainer {
+      background: #f0eadf;
+      border: 1px solid var(--line);
+      padding: 18px 20px;
+      margin-bottom: 24px;
+    }
+    .explainer h2 { margin: 0 0 8px; font-size: 18px; }
+    .explainer p { margin: 8px 0; color: #38342f; }
+    .board {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+      margin: 28px 0;
+    }
+    .agent-review {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      padding: 22px;
+      margin: 28px 0;
+    }
+    .agent-review h2 { margin: 0 0 6px; font-size: 22px; }
+    .agent-review p { margin: 0 0 16px; color: var(--muted); }
+    .review-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+    .review-grid article { border: 1px solid var(--line); padding: 12px; background: #faf6ed; }
+    .review-grid h3 { margin-top: 0; }
+    .team-card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      padding: 22px;
+      position: relative;
+      min-width: 0;
+    }
+    .rank-pill {
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      border: 1px solid var(--ink);
+      padding: 4px 8px;
+      font-weight: 900;
+      background: var(--paper);
+    }
+    h2 { margin: 0 48px 12px 0; font-size: 20px; overflow-wrap: anywhere; }
+    h3 { margin: 20px 0 8px; font-size: 13px; text-transform: uppercase; letter-spacing: .08em; }
+    .score { font-family: Georgia, "Times New Roman", serif; font-size: 64px; line-height: 1; }
+    .score-high { color: var(--green); }
+    .score-mid { color: var(--amber); }
+    .score-low { color: var(--red); }
+    .subscore { margin: 2px 0 16px; color: var(--muted); }
+    dl { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 0 0 18px; }
+    dt { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .07em; }
+    dd { margin: 0; font-weight: 800; overflow-wrap: anywhere; }
+    .coverage-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+    .heat {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      border: 1px solid var(--line);
+      padding: 8px;
+      min-height: 42px;
+      align-items: center;
+    }
+    .heat span { font-size: 12px; color: var(--muted); }
+    .heat em { display: block; margin-top: 4px; font-style: normal; color: var(--ink); font-size: 11px; overflow-wrap: anywhere; }
+    .heat strong { font-size: 15px; }
+    .heat.hot { background: #dfeee6; border-color: #98c2ad; }
+    .heat.warm { background: #fff0d2; border-color: #d8b36a; }
+    .heat.cold { background: #f5ded9; border-color: #d99d91; }
+    ul { margin: 0; padding-left: 18px; }
+    li { margin: 5px 0; }
+    .missing { color: var(--red); font-weight: 700; }
+    .ledger { margin: -6px 0 16px; font-weight: 800; color: var(--blue); }
+    .basis { margin: -8px 0 16px; color: var(--muted); font-weight: 700; }
+    .muted { color: var(--muted); }
+    .matrix {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      margin-top: 18px;
+      overflow-x: auto;
+    }
+    table { width: 100%; border-collapse: collapse; min-width: 760px; }
+    th, td { padding: 14px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: middle; }
+    th { font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+    .criterion { font-weight: 850; }
+    .mini-score { position: relative; height: 28px; border: 1px solid var(--line); background: #f0ebe2; overflow: hidden; }
+    .mini-score i { display: block; height: 100%; background: #b9d8ca; }
+    .mini-score span { position: absolute; inset: 4px 8px; z-index: 1; font-weight: 900; }
+    footer { margin-top: 28px; color: var(--muted); font-size: 13px; }
+    @media (max-width: 860px) {
+      header, .board, .review-grid { grid-template-columns: 1fr; }
+      h1 { font-size: 46px; }
+      dl { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <div>
+        <div class="eyebrow">G4A Bench / Week 4 / Evaluation Prototype</div>
+        <h1>ShipShape Evaluation Workbench</h1>
+        <p class="lede">A temporary report for debugging the benchmark process. It shows what the prototype extracted, what it trusted, what it did not verify, and where an agent must make judgment calls.</p>
+      </div>
+      <aside class="verdict">
+        <span>Status</span>
+        <strong>No final grade</strong>
+        <span>Run: 20260527T171423Z-static-prototype</span>
+      </aside>
+    </header>
+    <div class="notice">Prototype caveat: the large numbers below are extraction confidence, not grades. They do not prove the reported measurements are true, comparable, or sufficient.</div>
+    <section class="explainer">
+      <h2>How to Read This</h2>
+      <p><strong>Extraction confidence</strong> means the prototype found structured or semi-structured evidence. It is useful for triage, not for ranking teams.</p>
+      <p><strong>Category tile numbers</strong> mean different things by basis. For a structured ledger, they are ledger evidence objects. For a heuristic repo, they are matching evidence paths. Those are not comparable.</p>
+      <p><strong>Agent review required</strong> means a future evaluator must inspect the claim, the artifact, and the target path chosen by the team. Bundle size is the clearest example: total bundle reduction and initial-entry code splitting are both allowed, but they are not the same measurement.</p>
+    </section>
+    <section class="board">
+      
+            <section class="team-card">
+              <div class="rank-pill">#1</div>
+              <h2>github-com-michaelhabermas-ship-shape</h2>
+              <div class="score score-high">100.00</div>
+              <p class="subscore">extraction confidence, not final grade</p>
+              <p class='ledger'>Structured ledger: 8 / 8 categories proven.</p>
+              <p class="basis">Basis: structured submission ledger self reported</p>
+              <dl>
+                <div><dt>Commit</dt><dd>e5fed89d6c05</dd></div>
+                <div><dt>Evidence Files</dt><dd>158</dd></div>
+                <div><dt>Test Files</dt><dd>186</dd></div>
+              </dl>
+              <div class="coverage-grid"><div class='heat warm' title='type safety: cat1-total-counted-syntax-reduction: -53.4%; cat1-production-counted-syntax-reduction: -55.7% | Caveat: ESLint warning counts are useful as a worklist but are not the official before/after denominator.'><span>type safety<em>cat1-total-counted-syntax-reduction: -53.4%; cat1-production-counted-syntax-reduction: -55.7% | Caveat: ESLint warning counts are useful as a worklist but are not the official before/after denominator.</em></span><strong>11</strong></div>
+<div class='heat warm' title='bundle size: cat2-initial-entry-chunk-reduction: -73.9%; cat2-largest-chunk-reduction: -68.3% | Caveat: Total JS/CSS remains above baseline; the proven claim is limited to initial entry/code-splitting reduction. Lazy lowlight (2026-05-23) reduced largest chunk and total JS/CSS vs the prior closeout artifact without changing the claim ID.'><span>bundle size<em>cat2-initial-entry-chunk-reduction: -73.9%; cat2-largest-chunk-reduction: -68.3% | Caveat: Total JS/CSS remains above baseline; the proven claim is limited to initial entry/code-splitting reduction. Lazy lowlight (2026-05-23) reduced largest chunk and total JS/CSS vs the prior closeout artifact without changing the claim ID.</em></span><strong>10</strong></div>
+<div class='heat warm' title='api response time: cat3-my-week-p95-change-by-concurrency: 10c -21.09%, 25c -37.72%, 50c -36.35%; cat3-bootstrap-p95-change-by-concurrency: 10c -41.9%, 25c -60.35%, 50c -45.07% | Caveat: The benchmark intentionally bypasses API rate limiting in non-production to measure endpoint latency rather than limiter behavior.'><span>api response time<em>cat3-my-week-p95-change-by-concurrency: 10c -21.09%, 25c -37.72%, 50c -36.35%; cat3-bootstrap-p95-change-by-concurrency: 10c -41.9%, 25c -60.35%, 50c -45.07% | Caveat: The benchmark intentionally bypasses API rate limiting in non-production to measure endpoint latency rather than limiter behavior.</em></span><strong>9</strong></div>
+<div class='heat warm' title='database query: cat4-docs-startup-query-count-reduction: -27.3%; cat4-docs-startup-request-count-reduction: -85.7% | Caveat: Bootstrap query-count proof is flow-level app-shell consolidation, not a row-level N+1 fix.'><span>database query<em>cat4-docs-startup-query-count-reduction: -27.3%; cat4-docs-startup-request-count-reduction: -85.7% | Caveat: Bootstrap query-count proof is flow-level app-shell consolidation, not a row-level N+1 fix.</em></span><strong>14</strong></div>
+<div class='heat warm' title='test coverage: cat5-meaningful-regression-count: 3 / 3 | Caveat: Full E2E passed with retry artifact logs still recorded as flake follow-up context.'><span>test coverage<em>cat5-meaningful-regression-count: 3 / 3 | Caveat: Full E2E passed with retry artifact logs still recorded as flake follow-up context.</em></span><strong>11</strong></div>
+<div class='heat warm' title='runtime error: cat6-explicit-fix-proof-count: 3 / 3 | Caveat: Process-level unhandledRejection and uncaughtException handlers are now covered as operational runtime hardening, not as one of the original three user-facing fixes.'><span>runtime error<em>cat6-explicit-fix-proof-count: 3 / 3 | Caveat: Process-level unhandledRejection and uncaughtException handlers are now covered as operational runtime hardening, not as one of the original three user-facing fixes.</em></span><strong>14</strong></div>
+<div class='heat warm' title='accessibility: cat7-top3-axe-critical-serious-fixed: True; cat7-lighthouse-rerun-present: False | Caveat: Lighthouse was not rerun.'><span>accessibility<em>cat7-top3-axe-critical-serious-fixed: True; cat7-lighthouse-rerun-present: False | Caveat: Lighthouse was not rerun.</em></span><strong>10</strong></div>
+<div class='heat warm' title='security: cat8-required-attack-surface-coverage: 4 / 4; cat8-verified-vulnerability-fix-count: 2 / 2 | Caveat: Remote/deployed destructive probing remains out of scope by default; remote mode requires explicit --allow-write and --allow-stress.'><span>security<em>cat8-required-attack-surface-coverage: 4 / 4; cat8-verified-vulnerability-fix-count: 2 / 2 | Caveat: Remote/deployed destructive probing remains out of scope by default; remote mode requires explicit --allow-write and --allow-stress.</em></span><strong>12</strong></div></div>
+              <h3>Strengths</h3>
+              <ul><li>Broad audit language covers most Week 4 categories.</li><li>Structured submission ledger found with 8 proven categories.</li><li>Strong before/after and measurement vocabulary appears across submission evidence.</li><li>Category-specific evidence files appear for every required Week 4 category.</li><li>Security probe language appears to cover several required attack surfaces.</li><li>Repo includes a visible test surface for regression protection.</li></ul>
+              <h3>Risks</h3>
+              <ul><li>No major static risk found.</li></ul>
+              <h3>Impression Notes</h3>
+              <ul><li>Impression: notification-related work may be a reusable pattern worth inspecting.</li><li>Impression: accessibility work appears to use recognizable tools.</li><li>Impression: Playwright appears in the submission and may indicate runnable regression work.</li></ul>
+              <h3>Not Verified Yet</h3>
+              <ul><li>reported measurements are truthful</li><li>before/after artifacts are comparable</li><li>chosen target path satisfies the spec when multiple target paths exist</li><li>tests are meaningful</li><li>UI/deployed app behavior works</li></ul>
+              
+            </section>
+            
+            <section class="team-card">
+              <div class="rank-pill">#2</div>
+              <h2>labs-gauntletai-com-daltondinderman-shipshape</h2>
+              <div class="score score-high">99.30</div>
+              <p class="subscore">extraction confidence, not final grade</p>
+              <p class='ledger muted'>No structured ledger found; heuristic parsing only.</p>
+              <p class="basis">Basis: heuristic static path and text scan</p>
+              <dl>
+                <div><dt>Commit</dt><dd>7f394f245cd7</dd></div>
+                <div><dt>Evidence Files</dt><dd>437</dd></div>
+                <div><dt>Test Files</dt><dd>127</dd></div>
+              </dl>
+              <div class="coverage-grid"><div class='heat hot' title='type safety: 33 evidence paths'><span>type safety<em>33 evidence paths</em></span><strong>33</strong></div>
+<div class='heat hot' title='bundle size: 53 evidence paths'><span>bundle size<em>53 evidence paths</em></span><strong>53</strong></div>
+<div class='heat hot' title='api response time: 39 evidence paths'><span>api response time<em>39 evidence paths</em></span><strong>39</strong></div>
+<div class='heat hot' title='database query: 44 evidence paths'><span>database query<em>44 evidence paths</em></span><strong>44</strong></div>
+<div class='heat hot' title='test coverage: 30 evidence paths'><span>test coverage<em>30 evidence paths</em></span><strong>30</strong></div>
+<div class='heat hot' title='runtime error: 36 evidence paths'><span>runtime error<em>36 evidence paths</em></span><strong>36</strong></div>
+<div class='heat hot' title='accessibility: 60 evidence paths'><span>accessibility<em>60 evidence paths</em></span><strong>60</strong></div>
+<div class='heat hot' title='security: 117 evidence paths'><span>security<em>117 evidence paths</em></span><strong>117</strong></div></div>
+              <h3>Strengths</h3>
+              <ul><li>Broad audit language covers most Week 4 categories.</li><li>Strong before/after and measurement vocabulary appears across submission evidence.</li><li>Category-specific evidence files appear for every required Week 4 category.</li><li>Security probe language appears to cover several required attack surfaces.</li><li>Repo includes a visible test surface for regression protection.</li></ul>
+              <h3>Risks</h3>
+              <ul><li>No structured submission ledger found; this run falls back to heuristic evidence parsing.</li></ul>
+              <h3>Impression Notes</h3>
+              <ul><li>Impression: notification-related work may be a reusable pattern worth inspecting.</li><li>Impression: accessibility work appears to use recognizable tools.</li><li>Impression: Playwright appears in the submission and may indicate runnable regression work.</li></ul>
+              <h3>Not Verified Yet</h3>
+              <ul><li>reported measurements are truthful</li><li>before/after artifacts are comparable</li><li>chosen target path satisfies the spec when multiple target paths exist</li><li>tests are meaningful</li><li>UI/deployed app behavior works</li></ul>
+              
+            </section>
+            
+    </section>
+    <section class="agent-review">
+      <h2>Agent Review Required Before Scoring</h2>
+      <p>These are the actual judgment calls. A script can prepare the evidence; an evaluator agent has to answer these before a grade is credible.</p>
+      <div class="review-grid"><article><h3>type safety</h3><ul><li>Rerun or independently reproduce the submitted type-safety counts.</li><li>Inspect whether reductions came from meaningful narrowing and boundary typing, not superficial syntax churn.</li></ul></article>
+<article><h3>bundle size</h3><ul><li>Determine which allowed target the team is claiming: total bundle reduction or initial-load/code-splitting reduction.</li><li>Verify before/after bundle artifacts were produced under comparable build conditions.</li></ul></article>
+<article><h3>api response time</h3><ul><li>Verify P95 improvements on at least two endpoints under identical data volume, concurrency, hardware, and bypass/rate-limit conditions.</li><li>Check whether excluded or failed benchmark artifacts change the conclusion.</li></ul></article>
+<article><h3>database query</h3><ul><li>Verify the measured flow satisfies the Week 4 database-query target.</li><li>Check whether EXPLAIN/query-count evidence compares like with like.</li></ul></article>
+<article><h3>test coverage</h3><ul><li>Inspect whether the new tests are meaningful regression tests, not page-load or superficial assertions.</li><li>Check flake/RCA claims when the team uses flake-fix path instead of new-test path.</li></ul></article>
+<article><h3>runtime error</h3><ul><li>Inspect the three claimed error-handling fixes and confirm at least one addresses real user-facing data loss or confusion.</li><li>Check before/after reproduction steps or screenshots.</li></ul></article>
+<article><h3>accessibility</h3><ul><li>Determine whether the team chose Lighthouse improvement or Critical/Serious axe closeout.</li><li>Verify scope covers the top pages claimed and does not overstate manual screen-reader/keyboard coverage.</li></ul></article>
+<article><h3>security</h3><ul><li>Run or inspect the security probe tool and confirm it covers all four required attack surfaces.</li><li>Verify at least two vulnerability fixes with before/after proof and no broken tests.</li></ul></article></div>
+    </section>
+    <section class="matrix">
+      <table>
+        <thead><tr><th>Criterion</th><th>github-com-michaelhabermas-ship-shape</th><th>labs-gauntletai-com-daltondinderman-shipshape</th></tr></thead>
+        <tbody><tr><td class='criterion'>Deliverables</td><td><div class='mini-score'><span>15</span><i style='width:15.0%'></i></div></td><td><div class='mini-score'><span>15</span><i style='width:15.0%'></i></div></td></tr>
+<tr><td class='criterion'>Audit Coverage</td><td><div class='mini-score'><span>20</span><i style='width:20.0%'></i></div></td><td><div class='mini-score'><span>20</span><i style='width:20.0%'></i></div></td></tr>
+<tr><td class='criterion'>Proof</td><td><div class='mini-score'><span>25</span><i style='width:25.0%'></i></div></td><td><div class='mini-score'><span>25</span><i style='width:25.0%'></i></div></td></tr>
+<tr><td class='criterion'>Security</td><td><div class='mini-score'><span>15</span><i style='width:15.0%'></i></div></td><td><div class='mini-score'><span>14.3</span><i style='width:14.3%'></i></div></td></tr>
+<tr><td class='criterion'>Tests</td><td><div class='mini-score'><span>10</span><i style='width:10.0%'></i></div></td><td><div class='mini-score'><span>10</span><i style='width:10.0%'></i></div></td></tr>
+<tr><td class='criterion'>Repo Health</td><td><div class='mini-score'><span>10</span><i style='width:10.0%'></i></div></td><td><div class='mini-score'><span>10</span><i style='width:10.0%'></i></div></td></tr>
+<tr><td class='criterion'>Impressions</td><td><div class='mini-score'><span>5</span><i style='width:5.0%'></i></div></td><td><div class='mini-score'><span>5</span><i style='width:5.0%'></i></div></td></tr></tbody>
+      </table>
+    </section>
+    <footer>
+      Source artifacts: measurement plan, rubric, rankings, team summaries, and insights live beside this HTML file.
+    </footer>
+  </main>
+</body>
+</html>

@@ -1,0 +1,14 @@
+{
+  "cohort": "g4a-c5-2",
+  "mode": "static-prototype",
+  "repos_file": "g4a-challenger-repos/g4a-c5-2/week-4/REPOS.md",
+  "run_id": "20260527T160808Z-static-prototype",
+  "spec_files": [
+    "g4a-specs/g4a-c5-2/week-4/GFA-Week-4-ShipShape.txt",
+    "g4a-specs/g4a-c5-2/week-4/ShipShape-Kickoff.txt",
+    "g4a-specs/g4a-c5-2/week-4/Shipshape-Security-Audit.txt"
+  ],
+  "started_at": "2026-05-27T16:08:08.598649+00:00",
+  "week": 4,
+  "work_dir": "/private/tmp/g4a-bench-prototype/g4a-c5-2/week-4/20260527T160808Z-static-prototype"
+}

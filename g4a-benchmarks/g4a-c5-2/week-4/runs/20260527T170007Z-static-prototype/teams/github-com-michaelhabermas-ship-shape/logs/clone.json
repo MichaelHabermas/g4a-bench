@@ -1,0 +1,16 @@
+{
+  "cmd": [
+    "git",
+    "clone",
+    "--depth",
+    "1",
+    "https://github.com/MichaelHabermas/ship-shape",
+    "/private/tmp/g4a-bench-prototype/g4a-c5-2/week-4/20260527T170007Z-static-prototype/github-com-michaelhabermas-ship-shape"
+  ],
+  "completed_at": "2026-05-27T17:00:08.900066+00:00",
+  "cwd": null,
+  "exit_code": 0,
+  "started_at": "2026-05-27T17:00:07.052188+00:00",
+  "stderr": "Cloning into '/private/tmp/g4a-bench-prototype/g4a-c5-2/week-4/20260527T170007Z-static-prototype/github-com-michaelhabermas-ship-shape'...\n",
+  "stdout": ""
+}

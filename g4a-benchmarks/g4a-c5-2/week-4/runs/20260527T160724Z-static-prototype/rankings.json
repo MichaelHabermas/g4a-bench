@@ -1,0 +1,78 @@
+{
+  "rankings": [
+    {
+      "clone": {
+        "cmd": [
+          "git",
+          "clone",
+          "--depth",
+          "1",
+          "https://github.com/MichaelHabermas/ship-shape",
+          "/private/tmp/g4a-bench-prototype/g4a-c5-2/week-4/20260527T160724Z-static-prototype/github-com-michaelhabermas-ship-shape"
+        ],
+        "completed_at": "2026-05-27T16:07:24.534433+00:00",
+        "cwd": null,
+        "exit_code": 128,
+        "started_at": "2026-05-27T16:07:24.508859+00:00",
+        "stderr": "Cloning into '/private/tmp/g4a-bench-prototype/g4a-c5-2/week-4/20260527T160724Z-static-prototype/github-com-michaelhabermas-ship-shape'...\nfatal: unable to access 'https://github.com/MichaelHabermas/ship-shape/': Could not resolve host: github.com\n",
+        "stdout": ""
+      },
+      "commit_sha": null,
+      "impressions": [],
+      "repo_url": "https://github.com/MichaelHabermas/ship-shape",
+      "risks": [
+        "Repository could not be cloned."
+      ],
+      "scores": {
+        "W4-AUDIT-01": 0,
+        "W4-DOCS-01": 0,
+        "W4-INSIGHT-01": 0,
+        "W4-PROOF-01": 0,
+        "W4-REPO-01": 0,
+        "W4-SECURITY-01": 0,
+        "W4-TESTS-01": 0
+      },
+      "strengths": [],
+      "team": "github-com-michaelhabermas-ship-shape",
+      "total_score": 0,
+      "total_without_insight": 0
+    },
+    {
+      "clone": {
+        "cmd": [
+          "git",
+          "clone",
+          "--depth",
+          "1",
+          "https://labs.gauntletai.com/daltondinderman/shipshape",
+          "/private/tmp/g4a-bench-prototype/g4a-c5-2/week-4/20260527T160724Z-static-prototype/labs-gauntletai-com-daltondinderman-shipshape"
+        ],
+        "completed_at": "2026-05-27T16:07:24.557357+00:00",
+        "cwd": null,
+        "exit_code": 128,
+        "started_at": "2026-05-27T16:07:24.534931+00:00",
+        "stderr": "Cloning into '/private/tmp/g4a-bench-prototype/g4a-c5-2/week-4/20260527T160724Z-static-prototype/labs-gauntletai-com-daltondinderman-shipshape'...\nfatal: unable to access 'https://labs.gauntletai.com/daltondinderman/shipshape/': Could not resolve host: labs.gauntletai.com\n",
+        "stdout": ""
+      },
+      "commit_sha": null,
+      "impressions": [],
+      "repo_url": "https://labs.gauntletai.com/daltondinderman/shipshape",
+      "risks": [
+        "Repository could not be cloned."
+      ],
+      "scores": {
+        "W4-AUDIT-01": 0,
+        "W4-DOCS-01": 0,
+        "W4-INSIGHT-01": 0,
+        "W4-PROOF-01": 0,
+        "W4-REPO-01": 0,
+        "W4-SECURITY-01": 0,
+        "W4-TESTS-01": 0
+      },
+      "strengths": [],
+      "team": "labs-gauntletai-com-daltondinderman-shipshape",
+      "total_score": 0,
+      "total_without_insight": 0
+    }
+  ]
+}

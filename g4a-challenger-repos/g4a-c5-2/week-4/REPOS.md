@@ -16,3 +16,4 @@ Add one row per team. Keep team names stable — they label benchmark results.
 | ------ |
 | <https://github.com/MichaelHabermas/ship-shape> |
 | <https://labs.gauntletai.com/daltondinderman/shipshape> |
+| <https://labs.gauntletai.com/shivkanthalu/ship> |

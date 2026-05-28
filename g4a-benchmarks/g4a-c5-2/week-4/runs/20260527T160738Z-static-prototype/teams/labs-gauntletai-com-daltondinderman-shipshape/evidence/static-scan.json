@@ -1,0 +1,57 @@
+{
+  "category_hits": {
+    "accessibility": false,
+    "api response time": false,
+    "bundle size": false,
+    "database query": false,
+    "runtime error": false,
+    "security": false,
+    "test coverage": false,
+    "type safety": false
+  },
+  "clone": {
+    "cmd": [
+      "git",
+      "clone",
+      "--depth",
+      "1",
+      "https://labs.gauntletai.com/daltondinderman/shipshape",
+      "/private/tmp/g4a-bench-prototype/g4a-c5-2/week-4/20260527T160738Z-static-prototype/labs-gauntletai-com-daltondinderman-shipshape"
+    ],
+    "completed_at": "2026-05-27T16:07:38.307400+00:00",
+    "cwd": null,
+    "exit_code": 128,
+    "started_at": "2026-05-27T16:07:38.274403+00:00",
+    "stderr": "Cloning into '/private/tmp/g4a-bench-prototype/g4a-c5-2/week-4/20260527T160738Z-static-prototype/labs-gauntletai-com-daltondinderman-shipshape'...\nfatal: unable to access 'https://labs.gauntletai.com/daltondinderman/shipshape/': Could not resolve host: labs.gauntletai.com\n",
+    "stdout": ""
+  },
+  "code_file_count": 0,
+  "commit_sha": null,
+  "docs": {},
+  "file_count": 0,
+  "impressions": [],
+  "markdown_file_count": 0,
+  "package_scripts": [],
+  "proof_term_hits": [],
+  "recent_commits": [],
+  "repo_url": "https://labs.gauntletai.com/daltondinderman/shipshape",
+  "risks": [
+    "Repository could not be cloned."
+  ],
+  "sample_files": [],
+  "scores": {
+    "W4-AUDIT-01": 0,
+    "W4-DOCS-01": 0,
+    "W4-INSIGHT-01": 0,
+    "W4-PROOF-01": 0,
+    "W4-REPO-01": 0,
+    "W4-SECURITY-01": 0,
+    "W4-TESTS-01": 0
+  },
+  "security_term_hits": [],
+  "strengths": [],
+  "team": "labs-gauntletai-com-daltondinderman-shipshape",
+  "test_file_count": 0,
+  "total_score": 0,
+  "total_without_insight": 0
+}

@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bundle Size Process Trace</title>
+  <style>
+    :root {
+      --ink: #161616;
+      --muted: #666;
+      --paper: #f6f2ea;
+      --panel: #fffdfa;
+      --line: #d6cfc2;
+      --good: #176b55;
+      --warn: #9a5a10;
+      --bad: #9c2f25;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--paper);
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.4;
+    }
+    main { max-width: 1240px; margin: 0 auto; padding: 32px 24px 56px; }
+    header { border-bottom: 2px solid var(--ink); padding-bottom: 18px; margin-bottom: 22px; }
+    h1 { margin: 4px 0 8px; font-size: clamp(34px, 5vw, 58px); line-height: 1; letter-spacing: 0; }
+    h2 { margin: 0; font-size: 28px; letter-spacing: 0; }
+    h3 { margin: 22px 0 8px; font-size: 15px; text-transform: uppercase; letter-spacing: .08em; }
+    p { margin: 0 0 10px; }
+    .eyebrow { margin: 0; color: #244d83; font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: .12em; }
+    .muted { color: var(--muted); }
+    .note { max-width: 850px; color: #34302b; font-size: 17px; }
+    .spec { white-space: pre-wrap; max-height: 240px; overflow: auto; background: #fff8e8; border: 1px solid #d7bb7c; padding: 14px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13px; }
+    section.process, section.team { background: var(--panel); border: 1px solid var(--line); padding: 18px; margin: 18px 0; }
+    .team-head { display: grid; grid-template-columns: 1fr minmax(260px, 380px); gap: 18px; align-items: start; border-bottom: 1px solid var(--line); padding-bottom: 14px; }
+    .judgment { border-left: 4px solid var(--line); padding-left: 14px; }
+    .grid { display: grid; gap: 16px; }
+    .two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th, td { border: 1px solid var(--line); padding: 8px 10px; text-align: left; vertical-align: top; }
+    th { background: #eee7dc; font-weight: 750; }
+    .kv th { width: 280px; }
+    ul { margin: 0; padding-left: 22px; }
+    li { margin: 4px 0; }
+    code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .92em; }
+    .status { display: inline-block; padding: 3px 8px; border: 1px solid currentColor; font-weight: 750; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; }
+    .good { color: var(--good); background: #e7f4ee; }
+    .warn { color: var(--warn); background: #fff2d8; }
+    .bad { color: var(--bad); background: #f9e2df; }
+    @media (max-width: 820px) {
+      .two, .team-head { grid-template-columns: 1fr; }
+      main { padding: 22px 14px 40px; }
+      table { display: block; overflow-x: auto; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <p class="eyebrow">G4A Week 4 prototype</p>
+      <h1>Bundle Size Process Trace</h1>
+      <p class="note">This is a generalized evaluator trace pointed at bundle size. It is not a bundle-size product and it is not a final score.</p>
+    </header>
+
+    <section class="process">
+      <h3>Generalized Process</h3>
+      <table>
+        <thead><tr><th>Step</th><th>Question</th><th>Output Contract</th></tr></thead>
+        <tbody><tr><th>criterion-decomposition</th><td>What does the spec actually allow?</td><td>Two valid target paths: 15% total production bundle reduction, or 20% initial-load reduction via code splitting.</td></tr><tr><th>evidence-discovery</th><td>Where does this repo keep measurement evidence?</td><td>Search for structured ledgers, Markdown reports, before/after bundle JSON, delta reports, build logs, treemaps, evals, measurement-over-time artifacts, and measurement scripts.</td></tr><tr><th>claim-extraction</th><td>What path is the team claiming?</td><td>Extract stated claims, but mark them self-reported until artifacts or reruns support them.</td></tr><tr><th>artifact-extraction</th><td>Can raw before/after numbers be read from artifacts?</td><td>Prefer machine-readable JSON. Treat Markdown as a likely claim/explanation surface, not as proof by itself. Copied specs are noise.</td></tr><tr><th>target-resolution</th><td>Which allowed target path, if any, do the numbers satisfy?</td><td>Evaluate total and initial-load paths independently instead of collapsing them into one bundle score.</td></tr><tr><th>comparability-check</th><td>Are before and after measurements comparable?</td><td>Check same build command, same output scope, same compression basis, same app functionality, and no deletion-as-optimization.</td></tr><tr><th>independent-reproduction</th><td>Has the harness reproduced the measurement?</td><td>This prototype has not rerun builds. It can only mark artifact-backed, not independently verified.</td></tr></tbody>
+      </table>
+    </section>
+
+    <section class="process">
+      <h3>Spec Anchor</h3>
+      <div class="spec">Category 2: Bundle Size
+
+What you are measuring: The size of the production frontend bundle. Large bundles slow down initial
+page load, hurt performance on slow networks, and waste bandwidth. You are looking for oversized
+dependencies, missing code splitting, unused imports, and opportunities to reduce what the browser has
+to download.
+
+How to Measure
+   •    Build the production frontend and record the total output size
+   •    Use a bundle visualization tool (e.g., rollup-plugin-visualizer, vite-bundle-analyzer, or
+        source-map-explorer) to generate a treemap of the bundle
+   •    Identify the largest chunks and the largest individual dependencies within them
+
+   •   Check for unused dependencies: cross-reference package.json dependencies against actual
+       imports in the source code
+   •   Evaluate whether code splitting is in use and where lazy loading could reduce initial load
+
+Audit Deliverable
+
+ Metric                                          Your Baseline
+ Total production bundle size                    ___ KB
+ Largest chunk                                   ___ (name + size)
+ Number of chunks                                ___
+ Top 3 largest dependencies                      List with sizes
+ Unused dependencies identified                  List
+
+Improvement Target
+15% reduction in total production bundle size, or implement code splitting that reduces initial
+page load bundle by 20%. Provide before/after bundle analysis output. Removing functionality to shrink
+the bundle does not count.</div>
+    </section>
+
+    
+      <section class="team">
+        <div class="team-head">
+          <div>
+            <p class="eyebrow">repo trace</p>
+            <h2>github-com-michaelhabermas-ship-shape</h2>
+            <p class="muted">structured_ledger_with_artifact_pointers | commit e5fed89d6c05</p>
+          </div>
+          <div class="judgment">
+            <span class='status warn'>artifact_math_passes_initial_path_only</span>
+            <p>Artifact math supports the initial-load/code-splitting path, while total bundle does not pass.</p>
+          </div>
+        </div>
+
+        <div class="grid two">
+          <div>
+            <h3>Signal</h3>
+            <ul><li><code>signal</code> my-docs/evidence/submission-ledger.json</li><li><code>signal</code> my-docs/audit-evidence/category-2-bundle/bundle-stats.json</li><li><code>signal</code> my-docs/evidence-runs/cat2-easy-wins-20260523/collectors/bundle-stats.json</li><li><code>signal</code> my-docs/evidence-runs/cat2-easy-wins-20260523/collectors/bundle-analysis.html</li><li><code>markdown_candidate</code> .agents/skills/assessment-audit/SKILL.md</li><li><code>markdown_candidate</code> api/src/db/migrations/009_audit_logs_nullable_actor.sql</li><li><code>markdown_candidate</code> api/src/db/migrations/036_fix_audit_and_comments_fks.sql</li><li><code>markdown_candidate</code> api/src/routes/admin/audit-logs.ts</li><li><code>markdown_candidate</code> api/src/services/audit.ts</li><li><code>eval_candidate</code> api/src/fleetgraph/eval/boundaries.ts</li><li><code>eval_candidate</code> api/src/fleetgraph/eval/coverage.ts</li><li><code>eval_candidate</code> api/src/fleetgraph/eval/eval.test.ts</li><li><code>eval_candidate</code> api/src/fleetgraph/eval/executable-golden-cases.test.ts</li><li><code>eval_candidate</code> api/src/fleetgraph/eval/golden-cases.ts</li><li><code>measurement_over_time</code> api/src/db/migrations/003_document_history.sql</li><li><code>measurement_over_time</code> api/src/db/migrations/016_document_history_automated_by.sql</li><li><code>measurement_over_time</code> api/src/routes/issues-history.test.ts</li><li><code>measurement_over_time</code> my-docs/evidence-runs/cat2-easy-wins-20260523/SUMMARY.md</li><li><code>measurement_over_time</code> my-docs/evidence-runs/cat2-easy-wins-20260523/claims.json</li></ul>
+          </div>
+          <div>
+            <h3>Noise / Duplicates</h3>
+            <ul><li><code>noise</code> my-docs/project-weeks-sot/week-4/reviewer-evidence-bundle/index.html</li><li><code>noise</code> my-docs/project-weeks-sot/week-4/reviewer-evidence-bundle/manifest.json</li><li><code>noise</code> my-docs/project-weeks-sot/week-4/reviewer-evidence-bundle/my-docs/project-weeks-sot/week-4/Cat-8-Sec-Audit-and-Tool-plan.md</li><li><code>noise</code> my-docs/project-weeks-sot/week-4/reviewer-evidence-bundle/my-docs/project-weeks-sot/week-4/GFA-Week-4-ShipShape.txt</li><li><code>noise</code> my-docs/project-weeks-sot/week-4/reviewer-evidence-bundle/my-docs/project-weeks-sot/week-4/IMPROVEMENT_REPORT.md</li><li><code>noise</code> my-docs/project-weeks-sot/week-4/reviewer-evidence-bundle/my-docs/project-weeks-sot/week-4/SUBMISSION_CHECKLIST.md</li><li><code>noise</code> my-docs/project-weeks-sot/week-4/reviewer-evidence-bundle/my-docs/project-weeks-sot/week-4/Shipshape-Security-Audit.txt</li><li><code>noise</code> my-docs/project-weeks-sot/week-4/reviewer-evidence-bundle/my-docs/project-weeks-sot/week-4/reviewer-dashboard.html</li></ul>
+          </div>
+        </div>
+
+        <h3>Extracted Claim</h3>
+        <ul><li>Initial entry bundle decreased from 2025.10 KB to 528.48 KB, a 73.9% reduction, clearing the 20% code-splitting target with before/after bundle-analysis output present.</li></ul>
+
+        <h3>Raw Metrics</h3>
+        <table class="kv"><tr><th>total_js_css_kb_before</th><td>2262.65</td></tr>
+<tr><th>total_js_css_kb_after</th><td>2369.69</td></tr>
+<tr><th>initial_or_entry_kb_before</th><td>2025.1</td></tr>
+<tr><th>initial_or_entry_kb_after</th><td>528.48</td></tr>
+<tr><th>largest_chunk_kb_after</th><td>642.48</td></tr>
+<tr><th>chunk_count_before</th><td>262</td></tr>
+<tr><th>chunk_count_after</th><td>296</td></tr></table>
+
+        <h3>Target Path Resolution</h3>
+        <table>
+          <thead><tr><th>Path</th><th>Threshold</th><th>Before KB</th><th>After KB</th><th>Reduction %</th><th>State</th><th>Interpretation</th></tr></thead>
+          <tbody><tr><th>total-production-bundle</th><td>&gt;= 15% reduction</td><td>2262.65</td><td>2369.69</td><td>-4.73</td><td><span class='status bad'>fails_artifact_math</span></td><td>Comparable only if both totals use the same production output scope.</td></tr>
+<tr><th>initial-load-code-splitting</th><td>&gt;= 20% reduction</td><td>2025.1</td><td>528.48</td><td>73.9</td><td><span class='status good'>passes_artifact_math</span></td><td>Valid only if the reduction came from code splitting/lazy loading without removing functionality.</td></tr></tbody>
+        </table>
+
+        <h3>Judgment State Machine</h3>
+        <table>
+          <thead><tr><th>State</th><th>Value</th><th>Why</th></tr></thead>
+          <tbody><tr><th>claim_found</th><td><span class='status good'>yes</span></td><td>Structured claim exists in submission ledger.</td></tr>
+<tr><th>artifact_backed</th><td><span class='status good'>yes</span></td><td>Ledger points to baseline and latest bundle JSON artifacts.</td></tr>
+<tr><th>machine_readable_before_after</th><td><span class='status good'>yes</span></td><td>Raw KB values are extractable without reading prose.</td></tr>
+<tr><th>path_choice_explicit</th><td><span class='status good'>yes</span></td><td>Claim explicitly says initial-load/code-splitting, not total bundle.</td></tr>
+<tr><th>independently_reproduced</th><td><span class='status bad'>no</span></td><td>Harness has not rerun pnpm build:web or the collector.</td></tr>
+<tr><th>comparability</th><td><span class='status warn'>needs_agent_review</span></td><td>Baseline is report-extracted; latest is collector-extracted. Need command/environment confirmation.</td></tr></tbody>
+        </table>
+
+        <h3>Discovery Inventory</h3>
+        <table>
+          <thead><tr><th>Bucket</th><th>Count</th><th>Examples</th></tr></thead>
+          <tbody><tr><th>markdown_reports</th><td>152</td><td>.agents/skills/assessment-audit/SKILL.md, api/src/db/migrations/009_audit_logs_nullable_actor.sql, api/src/db/migrations/036_fix_audit_and_comments_fks.sql, api/src/routes/admin/audit-logs.ts</td></tr>
+<tr><th>bundle_json</th><td>3</td><td>my-docs/audit-evidence/category-2-bundle/bundle-stats.json, my-docs/evidence-runs/cat2-easy-wins-20260523/collectors/bundle-stats.json, my-docs/project-weeks-sot/week-4/reviewer-evidence-bundle/manifest.json</td></tr>
+<tr><th>evals</th><td>12</td><td>api/src/fleetgraph/eval/boundaries.ts, api/src/fleetgraph/eval/coverage.ts, api/src/fleetgraph/eval/eval.test.ts, api/src/fleetgraph/eval/executable-golden-cases.test.ts</td></tr>
+<tr><th>measurement_over_time</th><td>94</td><td>api/src/db/migrations/003_document_history.sql, api/src/db/migrations/016_document_history_automated_by.sql, api/src/routes/issues-history.test.ts, my-docs/evidence-runs/cat2-easy-wins-20260523/SUMMARY.md</td></tr></tbody>
+        </table>
+
+        <h3>Next Judgments</h3>
+        <table>
+          <thead><tr><th>Judgment</th><th>State</th><th>Why</th></tr></thead>
+          <tbody><tr><th>candidate_path</th><td><span class='status warn'>initial_load_only</span></td><td>The evaluator should preserve both target paths and avoid comparing total-bundle failures against initial-load wins as if they were the same metric.</td></tr>
+<tr><th>trust_level</th><td><span class='status warn'>artifact_backed_not_reproduced</span></td><td>Submitted artifacts can support a candidate judgment, but final confidence requires rerunning the measurement from a clean clone.</td></tr>
+<tr><th>comparison_risk</th><td><span class='status warn'>needs_agent_review</span></td><td>The next agent step is to verify command parity, output scope, compression/raw basis, and functionality preservation.</td></tr>
+<tr><th>time_series_signal</th><td><span class='status good'>candidate_signal_found</span></td><td>Measurement-over-time artifacts may show process quality or cherry-picking risk, but this prototype only inventories them.</td></tr></tbody>
+        </table>
+
+        <div class="grid two">
+          <div>
+            <h3>Caveats</h3>
+            <ul><li>Total JS/CSS remains above baseline; the proven claim is limited to initial entry/code-splitting reduction. Lazy lowlight (2026-05-23) reduced largest chunk and total JS/CSS vs the prior closeout artifact without changing the claim ID.</li></ul>
+          </div>
+          <div>
+            <h3>Agent Questions</h3>
+            <ul><li>Which of the two spec paths is the repo actually claiming?</li><li>Are before/after artifacts generated by the same command, same codebase scope, and same compression/raw basis?</li><li>Did code splitting preserve the user-facing feature set?</li><li>Can the harness rerun the measurement from a clean clone and get the same directionally correct result?</li><li>Should total bundle increase reduce confidence even when initial-load path passes?</li></ul>
+          </div>
+        </div>
+      </section>
+            
+      <section class="team">
+        <div class="team-head">
+          <div>
+            <p class="eyebrow">repo trace</p>
+            <h2>labs-gauntletai-com-daltondinderman-shipshape</h2>
+            <p class="muted">before_after_bundle_json_with_delta_markdown | commit 7f394f245cd7</p>
+          </div>
+          <div class="judgment">
+            <span class='status warn'>artifact_math_passes_initial_path_only</span>
+            <p>Artifact math supports the initial-load/code-splitting path, while total bundle does not pass.</p>
+          </div>
+        </div>
+
+        <div class="grid two">
+          <div>
+            <h3>Signal</h3>
+            <ul><li><code>signal</code> docs/category-improvements/evidence/02-bundle-size/before-bundle-size.json</li><li><code>signal</code> docs/category-improvements/evidence/02-bundle-size/after-bundle-size.json</li><li><code>signal</code> docs/category-improvements/evidence/02-bundle-size/bundle-size-delta.md</li><li><code>signal</code> scripts/category-improvements/measure-bundle-size.mjs</li><li><code>signal</code> scripts/category-improvements/verify-bundle-size-evidence.mjs</li><li><code>markdown_candidate</code> Audit Evidence/01 Type Safety/baseline.md</li><li><code>markdown_candidate</code> Audit Evidence/02 Bundle Size/build-web-sourcemap.log</li><li><code>markdown_candidate</code> Audit Evidence/02 Bundle Size/build-web.log</li><li><code>markdown_candidate</code> Audit Evidence/02 Bundle Size/depcheck-api.json</li><li><code>markdown_candidate</code> Audit Evidence/02 Bundle Size/depcheck-web.json</li><li><code>eval_candidate</code> Audit Evidence/03 API Response Time/api-benchmark-results-conservative.json</li><li><code>eval_candidate</code> Audit Evidence/03 API Response Time/api-benchmark-results-conservative.md</li><li><code>eval_candidate</code> Audit Evidence/03 API Response Time/api-benchmark-results-unpaced-rate-limited.json</li><li><code>eval_candidate</code> Audit Evidence/03 API Response Time/api-benchmark-results-unpaced-rate-limited.md</li><li><code>eval_candidate</code> Audit Evidence/03 API Response Time/conservative-api-benchmark.mjs</li><li><code>measurement_over_time</code> api/src/db/migrations/003_document_history.sql</li><li><code>measurement_over_time</code> api/src/db/migrations/016_document_history_automated_by.sql</li><li><code>measurement_over_time</code> api/src/routes/issues-history.test.ts</li><li><code>measurement_over_time</code> docs/category-improvements/evidence/full-regression/runs/category-1-type-safety/comparison-summary.json</li><li><code>measurement_over_time</code> docs/category-improvements/evidence/full-regression/runs/category-2-bundle-size/README.md</li></ul>
+          </div>
+          <div>
+            <h3>Noise / Duplicates</h3>
+            <ul><li><code>possible_duplicate</code> web/public/docs/category-improvements/evidence/02-bundle-size/after-build-web.log</li><li><code>possible_duplicate</code> web/public/docs/category-improvements/evidence/02-bundle-size/after-bundle-size-table.md</li><li><code>possible_duplicate</code> web/public/docs/category-improvements/evidence/02-bundle-size/after-bundle-size.json</li><li><code>possible_duplicate</code> web/public/docs/category-improvements/evidence/02-bundle-size/before-build-web.log</li><li><code>possible_duplicate</code> web/public/docs/category-improvements/evidence/02-bundle-size/before-bundle-size-table.md</li><li><code>possible_duplicate</code> web/public/docs/category-improvements/evidence/02-bundle-size/before-bundle-size.json</li><li><code>possible_duplicate</code> web/public/docs/category-improvements/evidence/02-bundle-size/bundle-size-delta.md</li><li><code>possible_duplicate</code> web/public/docs/category-improvements/evidence/02-bundle-size/changed-files.md</li></ul>
+          </div>
+        </div>
+
+        <h3>Extracted Claim</h3>
+        <ul><li>Status: passed</li><li>Target: total dist raw reduction &gt;= 15% or initial JS raw reduction &gt;= 20%.</li><li>| Initial JS raw | 2050.51 KB | 285.77 KB | 1764.74 KB | 86.06% |</li></ul>
+
+        <h3>Raw Metrics</h3>
+        <table class="kv"><tr><th>total_dist_kb_before</th><td>3961.46</td></tr>
+<tr><th>total_dist_kb_after</th><td>3988.5</td></tr>
+<tr><th>total_js_kb_before</th><td>2223.11</td></tr>
+<tr><th>total_js_kb_after</th><td>2250.16</td></tr>
+<tr><th>initial_js_kb_before</th><td>2050.51</td></tr>
+<tr><th>initial_js_kb_after</th><td>285.77</td></tr>
+<tr><th>initial_js_file_before</th><td>[&#x27;assets/index-D6OfRWen.js&#x27;]</td></tr>
+<tr><th>initial_js_file_after</th><td>[&#x27;assets/index-DHMnLIWv.js&#x27;]</td></tr></table>
+
+        <h3>Target Path Resolution</h3>
+        <table>
+          <thead><tr><th>Path</th><th>Threshold</th><th>Before KB</th><th>After KB</th><th>Reduction %</th><th>State</th><th>Interpretation</th></tr></thead>
+          <tbody><tr><th>total-production-bundle</th><td>&gt;= 15% reduction</td><td>3961.46</td><td>3988.5</td><td>-0.68</td><td><span class='status bad'>fails_artifact_math</span></td><td>Comparable only if both totals use the same production output scope.</td></tr>
+<tr><th>initial-load-code-splitting</th><td>&gt;= 20% reduction</td><td>2050.51</td><td>285.77</td><td>86.06</td><td><span class='status good'>passes_artifact_math</span></td><td>Valid only if the reduction came from code splitting/lazy loading without removing functionality.</td></tr></tbody>
+        </table>
+
+        <h3>Judgment State Machine</h3>
+        <table>
+          <thead><tr><th>State</th><th>Value</th><th>Why</th></tr></thead>
+          <tbody><tr><th>claim_found</th><td><span class='status good'>yes</span></td><td>Delta markdown declares pass/fail target and before/after result.</td></tr>
+<tr><th>artifact_backed</th><td><span class='status good'>yes</span></td><td>Before and after bundle JSON artifacts exist.</td></tr>
+<tr><th>machine_readable_before_after</th><td><span class='status good'>yes</span></td><td>Raw KB values are extractable from JSON.</td></tr>
+<tr><th>path_choice_explicit</th><td><span class='status good'>yes</span></td><td>Delta says total dist failed but initial JS passed.</td></tr>
+<tr><th>independently_reproduced</th><td><span class='status bad'>no</span></td><td>Harness has not rerun the measurement script.</td></tr>
+<tr><th>comparability</th><td><span class='status warn'>plausible_not_verified</span></td><td>Both artifacts share the same script shape and timestamps two minutes apart, but build inputs still need confirmation.</td></tr></tbody>
+        </table>
+
+        <h3>Discovery Inventory</h3>
+        <table>
+          <thead><tr><th>Bucket</th><th>Count</th><th>Examples</th></tr></thead>
+          <tbody><tr><th>markdown_reports</th><td>543</td><td>Audit Evidence/01 Type Safety/baseline.md, Audit Evidence/02 Bundle Size/build-web-sourcemap.log, Audit Evidence/02 Bundle Size/build-web.log, Audit Evidence/02 Bundle Size/depcheck-api.json</td></tr>
+<tr><th>bundle_json</th><td>25</td><td>Audit Evidence/02 Bundle Size/depcheck-api.json, Audit Evidence/02 Bundle Size/depcheck-web.json, Audit Evidence/02 Bundle Size/dist-size-data.json, Audit Evidence/02 Bundle Size/treemap.json</td></tr>
+<tr><th>evals</th><td>35</td><td>Audit Evidence/03 API Response Time/api-benchmark-results-conservative.json, Audit Evidence/03 API Response Time/api-benchmark-results-conservative.md, Audit Evidence/03 API Response Time/api-benchmark-results-unpaced-rate-limited.json, Audit Evidence/03 API Response Time/api-benchmark-results-unpaced-rate-limited.md</td></tr>
+<tr><th>measurement_over_time</th><td>98</td><td>api/src/db/migrations/003_document_history.sql, api/src/db/migrations/016_document_history_automated_by.sql, api/src/routes/issues-history.test.ts, docs/category-improvements/evidence/full-regression/runs/category-1-type-safety/comparison-summary.json</td></tr></tbody>
+        </table>
+
+        <h3>Next Judgments</h3>
+        <table>
+          <thead><tr><th>Judgment</th><th>State</th><th>Why</th></tr></thead>
+          <tbody><tr><th>candidate_path</th><td><span class='status warn'>initial_load_only</span></td><td>The evaluator should preserve both target paths and avoid comparing total-bundle failures against initial-load wins as if they were the same metric.</td></tr>
+<tr><th>trust_level</th><td><span class='status warn'>artifact_backed_not_reproduced</span></td><td>Submitted artifacts can support a candidate judgment, but final confidence requires rerunning the measurement from a clean clone.</td></tr>
+<tr><th>comparison_risk</th><td><span class='status warn'>needs_agent_review</span></td><td>The next agent step is to verify command parity, output scope, compression/raw basis, and functionality preservation.</td></tr>
+<tr><th>time_series_signal</th><td><span class='status good'>candidate_signal_found</span></td><td>Measurement-over-time artifacts may show process quality or cherry-picking risk, but this prototype only inventories them.</td></tr></tbody>
+        </table>
+
+        <div class="grid two">
+          <div>
+            <h3>Caveats</h3>
+            <ul><li>Total dist and total JS both increased in the submitted artifacts.</li><li>Initial JS reduction is large, but the harness has not confirmed preserved functionality or identical build inputs.</li><li>Evidence is duplicated under web/public; the docs path appears to be the cleaner source of truth.</li></ul>
+          </div>
+          <div>
+            <h3>Agent Questions</h3>
+            <ul><li>Which of the two spec paths is the repo actually claiming?</li><li>Are before/after artifacts generated by the same command, same codebase scope, and same compression/raw basis?</li><li>Did code splitting preserve the user-facing feature set?</li><li>Can the harness rerun the measurement from a clean clone and get the same directionally correct result?</li><li>Should total bundle increase reduce confidence even when initial-load path passes?</li></ul>
+          </div>
+        </div>
+      </section>
+            
+      <section class="team">
+        <div class="team-head">
+          <div>
+            <p class="eyebrow">repo trace</p>
+            <h2>labs-gauntletai-com-shivkanthalu-ship</h2>
+            <p class="muted">markdown_bundle_report_with_progressive_measurements | commit 6f74ef8d5883</p>
+          </div>
+          <div class="judgment">
+            <span class='status warn'>markdown_math_passes_pending_artifacts</span>
+            <p>Markdown-reported math supports a passing path, but raw bundle artifacts or reruns are still needed.</p>
+          </div>
+        </div>
+
+        <div class="grid two">
+          <div>
+            <h3>Signal</h3>
+            <ul><li><code>signal</code> docs/audit/category-2-bundle-size.md</li><li><code>signal</code> memory/project-treasury-audit.md</li><li><code>signal</code> web/vite.config.ts</li><li><code>signal</code> web/src/main.tsx</li><li><code>markdown_candidate</code> .claude/project-treasury-audit.md</li><li><code>markdown_candidate</code> api/src/db/migrations/009_audit_logs_nullable_actor.sql</li><li><code>markdown_candidate</code> api/src/db/migrations/036_fix_audit_and_comments_fks.sql</li><li><code>markdown_candidate</code> api/src/services/audit.ts</li><li><code>markdown_candidate</code> docs/audit/GFA - Security Audit.md</li><li><code>eval_candidate</code> .claude/feedback-benchmark-env.md</li><li><code>eval_candidate</code> api/src/fleetgraph/chat-eval.ts</li><li><code>eval_candidate</code> memory/feedback-benchmark-env.md</li><li><code>eval_candidate</code> scripts/benchmark-api.sh</li><li><code>measurement_over_time</code> api/src/db/migrations/003_document_history.sql</li><li><code>measurement_over_time</code> api/src/db/migrations/016_document_history_automated_by.sql</li><li><code>measurement_over_time</code> api/src/routes/issues-history.test.ts</li><li><code>measurement_over_time</code> web/src/components/ContentHistoryPanel.tsx</li><li><code>measurement_over_time</code> web/src/components/week/WeekTimeline.tsx</li></ul>
+          </div>
+          <div>
+            <h3>Noise / Duplicates</h3>
+            <ul><li class='muted'>No obvious copied-spec or duplicate-public paths found.</li></ul>
+          </div>
+        </div>
+
+        <h3>Extracted Claim</h3>
+        <ul><li>This audit measured the size of JavaScript delivered to users on first page load and the total production build output. The baseline shipped a single 589 KB gzip JavaScript chunk to every visitor — including users who only needed a login page. Through route-level code splitting, vendor chunk separation, lazy-loaded heavy dependencies, and removal of a production devtools leak, the initial JS payload dropped to 92.90 KB gzip — an 84% reduction that exceeds the GFA 20% target by a wide margin. Both GFA targets are met: initial JS payload is 92.90 KB gzip (−84% vs 589 KB baseline) and total `dist/` is 3.0 MB (−30% vs 4.3 MB baseline, below the 3.65 MB target). The 4.1 MB figure from the mid-pass audit snapshot included the 735 KB `stats.html` treemap artifact before it was made opt-in.</li><li>This audit measured the size of JavaScript delivered to users on first page load and the total production build output. The baseline shipped a single 589 KB gzip JavaScript chunk to every visitor — including users who only needed a login page. Through route-level code splitting, vendor chunk separation, lazy-loaded heavy dependencies, and removal of a production devtools leak, the initial JS payload dropped to 92.90 KB gzip — an 84% reduction that exceeds the GFA 20% target by a wide margin. Both GFA targets are met: initial JS payload is 92.90 KB gzip (−84% vs 589 KB baseline) and total `dist/` is 3.0 MB (−30% vs 4.3 MB baseline, below the 3.65 MB target). The 4.1 MB figure from the mid-pass audit snapshot included the 735 KB `stats.html` treemap artifact before it was made opt-in.</li><li>| Initial JS (HTML-preloaded, gzip) | ≤ 471 KB (−20%) | 589 KB | 92.90 KB | ✅ |</li><li>| Total `dist/` size | ≤ 3.65 MB (−15%) | 4.3 MB | 3.0 MB | ✅ |</li><li>These are code-split, on-demand modules — they do not affect the initial route payload. Both GFA targets are met: initial-load JS −84% and total `dist/` −30%.</li></ul>
+
+        <h3>Raw Metrics</h3>
+        <table class="kv"><tr><th>initial_js_gzip_kb_before</th><td>589.0</td></tr>
+<tr><th>initial_js_gzip_kb_after</th><td>92.9</td></tr>
+<tr><th>total_dist_kb_before_from_markdown_mb</th><td>4403.2</td></tr>
+<tr><th>total_dist_kb_after_from_markdown_mb</th><td>3072.0</td></tr>
+<tr><th>reported_route_lazy_count</th><td>15 routes lazy</td></tr>
+<tr><th>reported_measurement_command</th><td>pnpm build:shared &amp;&amp; pnpm --filter @ship/web build</td></tr>
+<tr><th>reported_treemap_command</th><td>ANALYZE_BUNDLE=true pnpm build:web</td></tr></table>
+
+        <h3>Target Path Resolution</h3>
+        <table>
+          <thead><tr><th>Path</th><th>Threshold</th><th>Before KB</th><th>After KB</th><th>Reduction %</th><th>State</th><th>Interpretation</th></tr></thead>
+          <tbody><tr><th>total-production-bundle</th><td>&gt;= 15% reduction</td><td>4403.2</td><td>3072.0</td><td>30.23</td><td><span class='status warn'>passes_markdown_math</span></td><td>Comparable only if both totals use the same production output scope. Values are extracted from Markdown, not raw bundle artifacts.</td></tr>
+<tr><th>initial-load-code-splitting</th><td>&gt;= 20% reduction</td><td>589.0</td><td>92.9</td><td>84.23</td><td><span class='status warn'>passes_markdown_math</span></td><td>Valid only if the reduction came from code splitting/lazy loading without removing functionality. Values are extracted from Markdown, not raw bundle artifacts.</td></tr></tbody>
+        </table>
+
+        <h3>Judgment State Machine</h3>
+        <table>
+          <thead><tr><th>State</th><th>Value</th><th>Why</th></tr></thead>
+          <tbody><tr><th>claim_found</th><td><span class='status good'>yes</span></td><td>Category 2 Markdown report makes explicit before/after bundle claims.</td></tr>
+<tr><th>artifact_backed</th><td><span class='status warn'>markdown_backed</span></td><td>The report includes methodology and tables, but no recognized before/after bundle JSON was found.</td></tr>
+<tr><th>machine_readable_before_after</th><td><span class='status bad'>no</span></td><td>Raw values came from Markdown parsing, not JSON artifacts.</td></tr>
+<tr><th>path_choice_explicit</th><td><span class='status good'>yes</span></td><td>Report claims both total dist reduction and initial JS reduction.</td></tr>
+<tr><th>measurements_over_time</th><td><span class='status good'>yes</span></td><td>Report includes Pass 1 through Pass 4 progressive metrics.</td></tr>
+<tr><th>independently_reproduced</th><td><span class='status bad'>no</span></td><td>Harness has not rerun the stated build or treemap commands.</td></tr>
+<tr><th>comparability</th><td><span class='status warn'>needs_agent_review</span></td><td>Need to verify baseline/current commits, stats.html exclusion, compression basis, and functionality preservation.</td></tr></tbody>
+        </table>
+
+        <h3>Discovery Inventory</h3>
+        <table>
+          <thead><tr><th>Bucket</th><th>Count</th><th>Examples</th></tr></thead>
+          <tbody><tr><th>markdown_reports</th><td>42</td><td>.claude/project-treasury-audit.md, api/src/db/migrations/009_audit_logs_nullable_actor.sql, api/src/db/migrations/036_fix_audit_and_comments_fks.sql, api/src/services/audit.ts</td></tr>
+<tr><th>bundle_json</th><td>0</td><td>none found</td></tr>
+<tr><th>evals</th><td>4</td><td>.claude/feedback-benchmark-env.md, api/src/fleetgraph/chat-eval.ts, memory/feedback-benchmark-env.md, scripts/benchmark-api.sh</td></tr>
+<tr><th>measurement_over_time</th><td>6</td><td>api/src/db/migrations/003_document_history.sql, api/src/db/migrations/016_document_history_automated_by.sql, api/src/routes/issues-history.test.ts, web/src/components/ContentHistoryPanel.tsx</td></tr></tbody>
+        </table>
+
+        <h3>Next Judgments</h3>
+        <table>
+          <thead><tr><th>Judgment</th><th>State</th><th>Why</th></tr></thead>
+          <tbody><tr><th>candidate_path</th><td><span class='status warn'>markdown_reported_pass</span></td><td>The evaluator should preserve both target paths and avoid comparing total-bundle failures against initial-load wins as if they were the same metric.</td></tr>
+<tr><th>trust_level</th><td><span class='status warn'>markdown_backed_not_reproduced</span></td><td>Submitted artifacts can support a candidate judgment, but final confidence requires rerunning the measurement from a clean clone.</td></tr>
+<tr><th>comparison_risk</th><td><span class='status warn'>needs_agent_review</span></td><td>The next agent step is to verify command parity, output scope, compression/raw basis, and functionality preservation.</td></tr>
+<tr><th>time_series_signal</th><td><span class='status good'>candidate_signal_found</span></td><td>Measurement-over-time artifacts may show process quality or cherry-picking risk, but this prototype only inventories them.</td></tr></tbody>
+        </table>
+
+        <div class="grid two">
+          <div>
+            <h3>Caveats</h3>
+            <ul><li>Numbers are extracted from a Markdown audit report, not from committed before/after bundle JSON.</li><li>Initial JS uses gzip KB while total dist uses raw MB converted to KB in the target table.</li><li>The report says a mid-pass 4.1 MB figure included stats.html; the evaluator should verify this from build artifacts or reruns.</li><li>Progressive pass history is useful process signal, but it can also hide cherry-picking unless rerun from clean baseline/current commits.</li></ul>
+          </div>
+          <div>
+            <h3>Agent Questions</h3>
+            <ul><li>Which of the two spec paths is the repo actually claiming?</li><li>Are before/after artifacts generated by the same command, same codebase scope, and same compression/raw basis?</li><li>Did code splitting preserve the user-facing feature set?</li><li>Can the harness rerun the measurement from a clean clone and get the same directionally correct result?</li><li>Should total bundle increase reduce confidence even when initial-load path passes?</li></ul>
+          </div>
+        </div>
+      </section>
+            
+  </main>
+</body>
+</html>

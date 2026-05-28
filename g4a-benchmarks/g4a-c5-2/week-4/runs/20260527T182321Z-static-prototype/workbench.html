@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>G4A Benchmark Workbench</title>
+  <style>
+    :root {
+      --ink: #171717;
+      --muted: #66615b;
+      --paper: #f4f0e8;
+      --panel: #fffdf8;
+      --line: #d2cabd;
+      --good: #176b55;
+      --warn: #9a5a10;
+      --bad: #9c2f25;
+      --blue: #274f7f;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--paper); color: var(--ink); font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; line-height: 1.38; }
+    main { max-width: 1280px; margin: 0 auto; padding: 28px 22px 54px; }
+    header { display: flex; justify-content: space-between; gap: 20px; align-items: end; border-bottom: 2px solid var(--ink); padding-bottom: 16px; }
+    h1 { margin: 0; font-size: clamp(34px, 5vw, 60px); line-height: .95; letter-spacing: 0; }
+    h2 { margin: 0 0 14px; font-size: 24px; }
+    h3 { margin: 0 0 8px; font-size: 18px; }
+    h4 { margin: 18px 0 8px; font-size: 13px; text-transform: uppercase; letter-spacing: .08em; }
+    p { margin: 0 0 10px; }
+    .muted { color: var(--muted); }
+    .tabs { display: flex; gap: 8px; margin: 20px 0; border-bottom: 1px solid var(--line); }
+    .tab-button { appearance: none; border: 1px solid var(--line); border-bottom: 0; background: #ebe3d6; color: var(--ink); padding: 10px 14px; font-weight: 750; cursor: pointer; }
+    .tab-button.active { background: var(--panel); color: var(--blue); }
+    .tab { display: none; background: var(--panel); border: 1px solid var(--line); padding: 18px; }
+    .tab.active { display: block; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th, td { border: 1px solid var(--line); padding: 8px 10px; text-align: left; vertical-align: top; }
+    th { background: #eee6da; font-weight: 760; }
+    .score { margin-top: 4px; font-weight: 800; }
+    .badge { display: inline-block; padding: 3px 8px; border: 1px solid currentColor; font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: .04em; }
+    .good { color: var(--good); background: #e7f4ee; }
+    .warn { color: var(--warn); background: #fff2d8; }
+    .bad { color: var(--bad); background: #f9e2df; }
+    .meter { width: 120px; height: 8px; background: #e0d8cc; display: inline-block; margin-right: 8px; vertical-align: middle; }
+    .meter i { display: block; height: 100%; background: var(--blue); }
+    .trace-card, .experiment { border: 1px solid var(--line); padding: 14px; margin: 14px 0; background: #fffaf1; }
+    .trace-grid { display: grid; grid-template-columns: minmax(0, 1fr) 220px; gap: 14px; align-items: start; }
+    .rerun-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; align-items: start; }
+    .counts { margin: 0; padding-left: 18px; }
+    .experiments { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+    .note { max-width: 720px; }
+    @media (max-width: 860px) {
+      header, .trace-grid, .rerun-grid, .experiments { grid-template-columns: 1fr; display: block; }
+      table { display: block; overflow-x: auto; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <div>
+        <p class="muted">Week 4 · Bundle-size specimen · Run 20260527T182321Z-static-prototype</p>
+        <h1>Benchmark Workbench</h1>
+      </div>
+      <p class="note muted">This page separates measurement readiness from final grading. It is asking: how usable is the evidence, where did it come from, and what judgment should the evaluator make next?</p>
+    </header>
+
+    <nav class="tabs">
+      <button class="tab-button active" data-tab="ratings">Ratings</button>
+      <button class="tab-button" data-tab="trace">Bundle Trace</button>
+      <button class="tab-button" data-tab="rerun">Rerun Plan</button>
+      <button class="tab-button" data-tab="next">Next Experiments</button>
+    </nav>
+
+    <section id="ratings" class="tab active">
+      <h2>Measurement Readiness</h2>
+      <table>
+        <thead><tr><th>Team</th><th>Readiness</th><th>Target Path</th><th>Evidence Shape</th><th>Current Judgment</th></tr></thead>
+        <tbody><tr><th>github-com-michaelhabermas-ship-shape</th><td><span class='badge warn'>strong candidate</span><div class='score'>9 / 12</div></td><td>initial path only</td><td>structured_ledger_with_artifact_pointers</td><td>Artifact math supports the initial-load/code-splitting path, while total bundle does not pass.</td></tr>
+<tr><th>labs-gauntletai-com-daltondinderman-shipshape</th><td><span class='badge warn'>strong candidate</span><div class='score'>9 / 12</div></td><td>initial path only</td><td>before_after_bundle_json_with_delta_markdown</td><td>Artifact math supports the initial-load/code-splitting path, while total bundle does not pass.</td></tr>
+<tr><th>labs-gauntletai-com-shivkanthalu-ship</th><td><span class='badge warn'>review candidate</span><div class='score'>7 / 12</div></td><td>both paths reported</td><td>markdown_bundle_report_with_progressive_measurements</td><td>Markdown-reported math supports a passing path, but raw bundle artifacts or reruns are still needed.</td></tr></tbody>
+      </table>
+
+      <h2 style="margin-top:22px">Why Those Ratings</h2>
+      <table>
+        <thead><tr><th>Dimension</th><th>github-com-michaelhabermas-ship-shape</th><th>labs-gauntletai-com-daltondinderman-shipshape</th><th>labs-gauntletai-com-shivkanthalu-ship</th></tr></thead>
+        <tbody><tr><th>Does extracted math satisfy an allowed spec path?</th><td><div class='meter'><i style='width:100.0%'></i></div><strong>3</strong></td><td><div class='meter'><i style='width:100.0%'></i></div><strong>3</strong></td><td><div class='meter'><i style='width:100.0%'></i></div><strong>3</strong></td></tr>
+<tr><th>Is the measurement backed by raw artifacts, or only prose?</th><td><div class='meter'><i style='width:100.0%'></i></div><strong>3</strong></td><td><div class='meter'><i style='width:100.0%'></i></div><strong>3</strong></td><td><div class='meter'><i style='width:33.33333333333333%'></i></div><strong>1</strong></td></tr>
+<tr><th>Does the repo make the claimed path explicit?</th><td><div class='meter'><i style='width:100.0%'></i></div><strong>2</strong></td><td><div class='meter'><i style='width:100.0%'></i></div><strong>2</strong></td><td><div class='meter'><i style='width:100.0%'></i></div><strong>2</strong></td></tr>
+<tr><th>Can before/after plausibly be compared?</th><td><div class='meter'><i style='width:100%'></i></div><strong>1</strong></td><td><div class='meter'><i style='width:100%'></i></div><strong>1</strong></td><td><div class='meter'><i style='width:100%'></i></div><strong>1</strong></td></tr>
+<tr><th>Has the harness rerun it from a clean clone?</th><td><div class='meter'><i style='width:0%'></i></div><strong>0</strong></td><td><div class='meter'><i style='width:0%'></i></div><strong>0</strong></td><td><div class='meter'><i style='width:0%'></i></div><strong>0</strong></td></tr></tbody>
+      </table>
+    </section>
+
+    <section id="trace" class="tab">
+      <h2>Compact Bundle Trace</h2>
+      
+    <article class="trace-card">
+      <h3>github-com-michaelhabermas-ship-shape</h3>
+      <p class="muted">structured_ledger_with_artifact_pointers</p>
+      <div class="trace-grid">
+        <div>
+          <h4>Target Math</h4>
+          <table><thead><tr><th>Path</th><th>Before</th><th>After</th><th>Reduction</th><th>State</th></tr></thead><tbody><tr><th>total-production-bundle</th><td>2262.65</td><td>2369.69</td><td>-4.73</td><td><span class='badge warn'>fails_artifact_math</span></td></tr><tr><th>initial-load-code-splitting</th><td>2025.1</td><td>528.48</td><td>73.9</td><td><span class='badge warn'>passes_artifact_math</span></td></tr></tbody></table>
+        </div>
+        <div>
+          <h4>Discovery Counts</h4>
+          <ul class="counts"><li><strong>bundle_json</strong>: 3</li><li><strong>evals</strong>: 12</li><li><strong>markdown_reports</strong>: 152</li><li><strong>measurement_over_time</strong>: 94</li></ul>
+        </div>
+      </div>
+      <h4>Judgment States</h4>
+      <table><tbody><tr><th>claim_found</th><td><span class='badge warn'>yes</span></td><td>Structured claim exists in submission ledger.</td></tr><tr><th>artifact_backed</th><td><span class='badge warn'>yes</span></td><td>Ledger points to baseline and latest bundle JSON artifacts.</td></tr><tr><th>machine_readable_before_after</th><td><span class='badge warn'>yes</span></td><td>Raw KB values are extractable without reading prose.</td></tr><tr><th>path_choice_explicit</th><td><span class='badge warn'>yes</span></td><td>Claim explicitly says initial-load/code-splitting, not total bundle.</td></tr><tr><th>independently_reproduced</th><td><span class='badge warn'>no</span></td><td>Harness has not rerun pnpm build:web or the collector.</td></tr><tr><th>comparability</th><td><span class='badge warn'>needs_agent_review</span></td><td>Baseline is report-extracted; latest is collector-extracted. Need command/environment confirmation.</td></tr></tbody></table>
+    </article>
+    
+
+    <article class="trace-card">
+      <h3>labs-gauntletai-com-daltondinderman-shipshape</h3>
+      <p class="muted">before_after_bundle_json_with_delta_markdown</p>
+      <div class="trace-grid">
+        <div>
+          <h4>Target Math</h4>
+          <table><thead><tr><th>Path</th><th>Before</th><th>After</th><th>Reduction</th><th>State</th></tr></thead><tbody><tr><th>total-production-bundle</th><td>3961.46</td><td>3988.5</td><td>-0.68</td><td><span class='badge warn'>fails_artifact_math</span></td></tr><tr><th>initial-load-code-splitting</th><td>2050.51</td><td>285.77</td><td>86.06</td><td><span class='badge warn'>passes_artifact_math</span></td></tr></tbody></table>
+        </div>
+        <div>
+          <h4>Discovery Counts</h4>
+          <ul class="counts"><li><strong>bundle_json</strong>: 25</li><li><strong>evals</strong>: 35</li><li><strong>markdown_reports</strong>: 543</li><li><strong>measurement_over_time</strong>: 98</li></ul>
+        </div>
+      </div>
+      <h4>Judgment States</h4>
+      <table><tbody><tr><th>claim_found</th><td><span class='badge warn'>yes</span></td><td>Delta markdown declares pass/fail target and before/after result.</td></tr><tr><th>artifact_backed</th><td><span class='badge warn'>yes</span></td><td>Before and after bundle JSON artifacts exist.</td></tr><tr><th>machine_readable_before_after</th><td><span class='badge warn'>yes</span></td><td>Raw KB values are extractable from JSON.</td></tr><tr><th>path_choice_explicit</th><td><span class='badge warn'>yes</span></td><td>Delta says total dist failed but initial JS passed.</td></tr><tr><th>independently_reproduced</th><td><span class='badge warn'>no</span></td><td>Harness has not rerun the measurement script.</td></tr><tr><th>comparability</th><td><span class='badge warn'>plausible_not_verified</span></td><td>Both artifacts share the same script shape and timestamps two minutes apart, but build inputs still need confirmation.</td></tr></tbody></table>
+    </article>
+    
+
+    <article class="trace-card">
+      <h3>labs-gauntletai-com-shivkanthalu-ship</h3>
+      <p class="muted">markdown_bundle_report_with_progressive_measurements</p>
+      <div class="trace-grid">
+        <div>
+          <h4>Target Math</h4>
+          <table><thead><tr><th>Path</th><th>Before</th><th>After</th><th>Reduction</th><th>State</th></tr></thead><tbody><tr><th>total-production-bundle</th><td>4403.2</td><td>3072.0</td><td>30.23</td><td><span class='badge warn'>passes_markdown_math</span></td></tr><tr><th>initial-load-code-splitting</th><td>589.0</td><td>92.9</td><td>84.23</td><td><span class='badge warn'>passes_markdown_math</span></td></tr></tbody></table>
+        </div>
+        <div>
+          <h4>Discovery Counts</h4>
+          <ul class="counts"><li><strong>bundle_json</strong>: 0</li><li><strong>evals</strong>: 4</li><li><strong>markdown_reports</strong>: 42</li><li><strong>measurement_over_time</strong>: 6</li></ul>
+        </div>
+      </div>
+      <h4>Judgment States</h4>
+      <table><tbody><tr><th>claim_found</th><td><span class='badge warn'>yes</span></td><td>Category 2 Markdown report makes explicit before/after bundle claims.</td></tr><tr><th>artifact_backed</th><td><span class='badge warn'>markdown_backed</span></td><td>The report includes methodology and tables, but no recognized before/after bundle JSON was found.</td></tr><tr><th>machine_readable_before_after</th><td><span class='badge warn'>no</span></td><td>Raw values came from Markdown parsing, not JSON artifacts.</td></tr><tr><th>path_choice_explicit</th><td><span class='badge warn'>yes</span></td><td>Report claims both total dist reduction and initial JS reduction.</td></tr><tr><th>measurements_over_time</th><td><span class='badge warn'>yes</span></td><td>Report includes Pass 1 through Pass 4 progressive metrics.</td></tr><tr><th>independently_reproduced</th><td><span class='badge warn'>no</span></td><td>Harness has not rerun the stated build or treemap commands.</td></tr><tr><th>comparability</th><td><span class='badge warn'>needs_agent_review</span></td><td>Need to verify baseline/current commits, stats.html exclusion, compression basis, and functionality preservation.</td></tr></tbody></table>
+    </article>
+    
+    </section>
+
+    <section id="rerun" class="tab">
+      <h2>Rerun Plan</h2>
+      <p class="muted">This is the bridge from submitted evidence to benchmark measurement. These commands are not yet executed by this page; they are the next evaluator actions and the rules for changing the readiness rating.</p>
+      
+            <article class="trace-card">
+              <h3>github-com-michaelhabermas-ship-shape</h3>
+              <p class="muted">structured_ledger_with_artifact_pointers</p>
+              <h4>Commands To Try</h4>
+              <table>
+                <thead><tr><th>Step</th><th>Command</th><th>Expected Evidence</th></tr></thead>
+                <tbody><tr><th>Locate declared artifacts</th><td><code>test -f my-docs/audit-evidence/category-2-bundle/bundle-stats.json &amp;&amp; test -f my-docs/evidence-runs/cat2-easy-wins-20260523/collectors/bundle-stats.json</code></td><td>Both declared bundle-stat artifacts exist in the clean clone.</td></tr>
+<tr><th>Rebuild current bundle</th><td><code>pnpm install --frozen-lockfile &amp;&amp; pnpm build:web</code></td><td>Production web build succeeds without relying on committed dist output.</td></tr>
+<tr><th>Rerun collector</th><td><code>node scripts/evidence/collectors/bundle-stats.mjs</code></td><td>Collector emits current entry chunk, total JS/CSS, largest chunks, and countable outputs.</td></tr></tbody>
+              </table>
+              <div class="rerun-grid">
+                <div>
+                  <h4>Blockers To Watch</h4>
+                  <ul><li>Dependency install may fail or take long in clean clone.</li><li>Build may require environment variables not present in the benchmark worker.</li><li>Baseline commit may not be reconstructable from submitted artifacts alone.</li><li>Baseline and latest artifacts may have been produced by different collectors or scopes.</li></ul>
+                </div>
+                <div>
+                  <h4>Rating Change Rules</h4>
+                  <ul><li>Keep evidence artifact-backed only if the rerun can point to raw generated outputs, not just committed summaries.</li><li>Upgrade reproduction from 0 when a clean-clone rerun produces comparable current measurements.</li><li>Downgrade target confidence if the rerun does not match the submitted after numbers directionally.</li><li>Downgrade comparability if commands, output scope, raw/gzip basis, or baseline/current commits do not line up.</li></ul>
+                </div>
+              </div>
+            </article>
+            
+
+            <article class="trace-card">
+              <h3>labs-gauntletai-com-daltondinderman-shipshape</h3>
+              <p class="muted">before_after_bundle_json_with_delta_markdown</p>
+              <h4>Commands To Try</h4>
+              <table>
+                <thead><tr><th>Step</th><th>Command</th><th>Expected Evidence</th></tr></thead>
+                <tbody><tr><th>Verify submitted pair</th><td><code>node scripts/category-improvements/verify-bundle-size-evidence.mjs</code></td><td>Before/after JSON pair validates and reproduces the submitted delta table.</td></tr>
+<tr><th>Rebuild current bundle</th><td><code>pnpm install --frozen-lockfile &amp;&amp; pnpm build:web</code></td><td>Production web build succeeds from clean clone.</td></tr>
+<tr><th>Rerun measurement script</th><td><code>node scripts/category-improvements/measure-bundle-size.mjs --label harness-current</code></td><td>New current measurement matches the submitted after directionally.</td></tr></tbody>
+              </table>
+              <div class="rerun-grid">
+                <div>
+                  <h4>Blockers To Watch</h4>
+                  <ul><li>Dependency install may fail or take long in clean clone.</li><li>Build may require environment variables not present in the benchmark worker.</li><li>Baseline commit may not be reconstructable from submitted artifacts alone.</li><li>Submitted before/after artifacts may both come from current repo state rather than distinct commits.</li></ul>
+                </div>
+                <div>
+                  <h4>Rating Change Rules</h4>
+                  <ul><li>Keep evidence artifact-backed only if the rerun can point to raw generated outputs, not just committed summaries.</li><li>Upgrade reproduction from 0 when a clean-clone rerun produces comparable current measurements.</li><li>Downgrade target confidence if the rerun does not match the submitted after numbers directionally.</li><li>Downgrade comparability if commands, output scope, raw/gzip basis, or baseline/current commits do not line up.</li></ul>
+                </div>
+              </div>
+            </article>
+            
+
+            <article class="trace-card">
+              <h3>labs-gauntletai-com-shivkanthalu-ship</h3>
+              <p class="muted">markdown_bundle_report_with_progressive_measurements</p>
+              <h4>Commands To Try</h4>
+              <table>
+                <thead><tr><th>Step</th><th>Command</th><th>Expected Evidence</th></tr></thead>
+                <tbody><tr><th>Compile Markdown claim</th><td><code>parse docs/audit/category-2-bundle-size.md for scorecard, methodology, pass history, and commands</code></td><td>Extract both reported target paths and the stated build/analysis commands.</td></tr>
+<tr><th>Generate missing raw artifact</th><td><code>pnpm install --frozen-lockfile &amp;&amp; pnpm build:web &amp;&amp; du -sh web/dist</code></td><td>Current total dist can be measured directly instead of trusted from Markdown.</td></tr>
+<tr><th>Generate treemap</th><td><code>ANALYZE_BUNDLE=true pnpm build:web</code></td><td>Treemap/stats artifact exists and can confirm initial chunks and package composition.</td></tr></tbody>
+              </table>
+              <div class="rerun-grid">
+                <div>
+                  <h4>Blockers To Watch</h4>
+                  <ul><li>Dependency install may fail or take long in clean clone.</li><li>Build may require environment variables not present in the benchmark worker.</li><li>Baseline commit may not be reconstructable from submitted artifacts alone.</li><li>Markdown report claims a baseline, but no raw before JSON was recognized.</li></ul>
+                </div>
+                <div>
+                  <h4>Rating Change Rules</h4>
+                  <ul><li>Upgrade evidence from Markdown-backed to artifact-backed only after raw bundle artifacts are generated or found.</li><li>Upgrade reproduction from 0 when a clean-clone rerun produces comparable current measurements.</li><li>Downgrade target confidence if the rerun does not match the submitted after numbers directionally.</li><li>Downgrade comparability if commands, output scope, raw/gzip basis, or baseline/current commits do not line up.</li></ul>
+                </div>
+              </div>
+            </article>
+            
+    </section>
+
+    <section id="next" class="tab">
+      <h2>Recommended Next Tabs / Capabilities</h2>
+      <div class="experiments"><article class='experiment'><h3>Markdown claim compiler</h3><strong>Do this next.</strong><p>Shiv&#x27;s repo shows the common case: the evidence is in Markdown tables. The harness needs to extract claims from prose, then downgrade trust until raw artifacts or reruns exist.</p></article>
+<article class='experiment'><h3>Clean-clone bundle rerunner</h3><strong>Do after claim compiler.</strong><p>All three are currently not reproduced. This is the first thing that turns evidence review into benchmark measurement.</p></article>
+<article class='experiment'><h3>Comparability verifier</h3><strong>Build as a judgment agent prompt plus deterministic checks.</strong><p>The hard question is not only whether numbers changed. It is whether baseline/current use the same command, output scope, compression basis, and functionality.</p></article>
+<article class='experiment'><h3>Noise reducer</h3><strong>Keep lightweight for now.</strong><p>Discovery counts are too large. We need to classify copied specs, public duplicates, generated evidence bundles, and source-of-truth reports.</p></article></div>
+    </section>
+  </main>
+  <script>
+    const buttons = document.querySelectorAll('.tab-button');
+    const tabs = document.querySelectorAll('.tab');
+    buttons.forEach((button) => {
+      button.addEventListener('click', () => {
+        buttons.forEach((item) => item.classList.remove('active'));
+        tabs.forEach((item) => item.classList.remove('active'));
+        button.classList.add('active');
+        document.getElementById(button.dataset.tab).classList.add('active');
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,63 @@
+{
+  "categories": [
+    "type safety",
+    "bundle size",
+    "api response time",
+    "database query",
+    "test coverage",
+    "runtime error",
+    "accessibility",
+    "security"
+  ],
+  "rubric": [
+    {
+      "description": "README/setup, audit/improvement/discovery/cost docs, and evidence that the team oriented around Ship.",
+      "id": "W4-DOCS-01",
+      "method": "static",
+      "name": "Required deliverables and orientation",
+      "weight": 15
+    },
+    {
+      "description": "Coverage of the seven required ShipShape categories plus the security audit extension.",
+      "id": "W4-AUDIT-01",
+      "method": "static_text",
+      "name": "Audit coverage across categories",
+      "weight": 20
+    },
+    {
+      "description": "Concrete baseline/after language, benchmarks, measurements, and reproducibility signals.",
+      "id": "W4-PROOF-01",
+      "method": "static_text",
+      "name": "Before/after improvement evidence",
+      "weight": 25
+    },
+    {
+      "description": "Runnable security probe or audit tooling covering auth/session, WebSocket validation, input sanitization, dependency audit, and manual review concerns.",
+      "id": "W4-SECURITY-01",
+      "method": "static_code",
+      "name": "Security probe deliverable",
+      "weight": 15
+    },
+    {
+      "description": "Presence of meaningful tests and scripts connected to the improvement work.",
+      "id": "W4-TESTS-01",
+      "method": "static_code",
+      "name": "Testing and regression protection",
+      "weight": 10
+    },
+    {
+      "description": "Basic project health: package metadata, workspace/config files, source tree, and recent commit availability.",
+      "id": "W4-REPO-01",
+      "method": "static_code",
+      "name": "Repo health and runnable shape",
+      "weight": 10
+    },
+    {
+      "description": "Interesting choices, standout polish, or transferable ideas visible from static review.",
+      "id": "W4-INSIGHT-01",
+      "method": "impression",
+      "name": "Cohort learning signal",
+      "weight": 5
+    }
+  ]
+}

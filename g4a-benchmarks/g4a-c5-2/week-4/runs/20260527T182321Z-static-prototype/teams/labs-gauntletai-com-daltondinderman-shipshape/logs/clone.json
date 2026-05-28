@@ -1,0 +1,16 @@
+{
+  "cmd": [
+    "git",
+    "clone",
+    "--depth",
+    "1",
+    "https://labs.gauntletai.com/daltondinderman/shipshape",
+    "/private/tmp/g4a-bench-prototype/g4a-c5-2/week-4/20260527T182321Z-static-prototype/labs-gauntletai-com-daltondinderman-shipshape"
+  ],
+  "completed_at": "2026-05-27T18:23:25.156914+00:00",
+  "cwd": null,
+  "exit_code": 0,
+  "started_at": "2026-05-27T18:23:23.480549+00:00",
+  "stderr": "Cloning into '/private/tmp/g4a-bench-prototype/g4a-c5-2/week-4/20260527T182321Z-static-prototype/labs-gauntletai-com-daltondinderman-shipshape'...\nwarning: redirecting to https://labs.gauntletai.com/daltondinderman/shipshape.git/\n",
+  "stdout": ""
+}

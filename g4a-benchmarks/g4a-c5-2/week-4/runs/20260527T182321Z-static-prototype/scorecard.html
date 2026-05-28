@@ -1,72 +1,52 @@
 <!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>G4A Week 4 — who did best</title>
 <style>
-  :root{
-    --ink:#191919;--muted:#6b655d;--paper:#f5f1e9;--panel:#fffdf8;--line:#d6cdbf;
-    --good:#1c6b54;--good-bg:#e6f3ec;--bad:#9c2f25;--bad-bg:#f8e1de;
-    --grey:#7c756b;--grey-bg:#ece7dd;--blue:#274f7f;--warn:#9a5a10;--warn-bg:#fdf0d8;
-    --gold:#9a7a16;--gold-bg:#fbf3d6;
-  }
-  *{box-sizing:border-box}
-  body{margin:0;background:var(--paper);color:var(--ink);font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.4}
-  main{max-width:980px;margin:0 auto;padding:26px 20px 90px}
-  h1{font-size:30px;margin:0 0 4px}
-  .lead{color:var(--muted);max-width:760px;margin:0 0 18px;font-size:14px}
+  :root{--ink:#191919;--muted:#6b655d;--paper:#f5f1e9;--panel:#fffdf8;--line:#d6cdbf;--good:#1c6b54;--good-bg:#e6f3ec;--bad:#9c2f25;--bad-bg:#f8e1de;--grey:#7c756b;--grey-bg:#ece7dd;--blue:#274f7f;--warn:#9a5a10;--warn-bg:#fdf0d8;--gold:#9a7a16;--gold-bg:#fbf3d6;}
+  *{box-sizing:border-box} body{margin:0;background:var(--paper);color:var(--ink);font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.4}
+  main{max-width:1000px;margin:0 auto;padding:26px 20px 90px} h1{font-size:30px;margin:0 0 4px}
+  .lead{color:var(--muted);max-width:780px;margin:0 0 18px;font-size:14px}
   .overall{display:flex;align-items:center;gap:12px;background:var(--gold-bg);border:1px solid var(--gold);padding:12px 16px;margin-bottom:18px}
-  .overall .lbl{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted)}
-  .overall .who{font-size:22px;font-weight:850;color:var(--gold)}
+  .overall .lbl{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted)} .overall .who{font-size:22px;font-weight:850;color:var(--gold)}
   table{width:100%;border-collapse:collapse}
   thead .repohead{text-align:center;font-weight:850;font-size:16px;border-bottom:2px solid var(--ink);width:24%;padding:8px 10px}
   thead .metrichead{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.06em;width:28%;text-align:left;padding:8px 10px}
   tr.catrow td{background:#ece4d7;border-top:1px solid var(--line);padding:8px 10px}
   .catname{font-weight:850;font-size:13px;text-transform:uppercase;letter-spacing:.05em}
-  .catbest{float:right;font-weight:800;font-size:12px;color:var(--gold)}
-  .prov{color:var(--muted);font-weight:600}
-  tbody td{border-bottom:1px solid var(--line);padding:7px 10px;vertical-align:middle}
-  .mlabel{color:var(--muted);font-size:13px}
-  .cell{text-align:center;width:24%}
-  .num{font-weight:800;font-size:15px}
-  .down{color:var(--good)}.flat{color:var(--bad)}.na{color:var(--grey);font-weight:600;text-align:center}
+  .vbadge{font-size:10px;font-weight:800;color:var(--good);background:var(--good-bg);border:1px solid var(--good);padding:1px 6px;border-radius:8px;text-transform:uppercase;margin-left:8px}
+  .ubadge{font-size:10px;font-weight:800;color:var(--warn);background:var(--warn-bg);border:1px solid var(--warn);padding:1px 6px;border-radius:8px;text-transform:uppercase;margin-left:8px}
+  .catbest{float:right;font-weight:800;font-size:12px;color:var(--gold)} .prov{color:var(--muted);font-weight:600}
+  tbody td{border-bottom:1px solid var(--line);padding:7px 10px;vertical-align:middle} .mlabel{color:var(--muted);font-size:13px}
+  .cell{text-align:center;width:24%} .num{font-weight:800;font-size:15px} .down{color:var(--good)} .flat{color:var(--bad)} .na{color:var(--grey);font-weight:600;text-align:center}
   .rung{display:inline-block;font-size:9px;font-weight:700;padding:0 5px;border-radius:8px;border:1px solid currentColor;vertical-align:middle}
-  .md{color:var(--warn);background:var(--warn-bg)}.art{color:var(--blue);background:#e4ecf6}.repro{color:var(--good);background:var(--good-bg)}.claim{color:var(--grey);background:var(--grey-bg)}
-  .j{font-size:10px;font-weight:800;vertical-align:middle}
-  .j-ok{color:var(--good)}.j-q{color:var(--warn)}.j-x{color:var(--bad)}.j-na{color:var(--grey)}
-  .best{background:var(--gold-bg);box-shadow:inset 3px 0 0 var(--gold)}
-  .star{color:var(--gold)}
-  .tip{position:relative;cursor:help}
-  .tip::before{content:"ⓘ";font-size:11px;color:var(--muted);margin-left:5px;font-weight:700}
-  .tip:hover::after{content:attr(data-tip);position:absolute;right:0;top:130%;white-space:pre-line;width:320px;background:#1d1b16;color:#f4efe6;padding:10px 12px;font-size:12px;line-height:1.4;border-radius:5px;z-index:30;font-weight:500;box-shadow:0 6px 20px rgba(0,0,0,.3);text-transform:none;letter-spacing:0;text-align:left}
+  .md{color:var(--warn);background:var(--warn-bg)} .art{color:var(--blue);background:#e4ecf6} .ver{color:var(--good);background:var(--good-bg)} .claim{color:var(--grey);background:var(--grey-bg)}
+  .j{font-size:10px;font-weight:800;vertical-align:middle} .j-ok{color:var(--good)} .j-q{color:var(--warn)} .j-x{color:var(--bad)} .j-na{color:var(--grey)}
+  .flagmark{color:var(--bad);font-weight:900} .best{background:var(--gold-bg);box-shadow:inset 3px 0 0 var(--gold)} .star{color:var(--gold)}
+  .tip{position:relative;cursor:help} .tip::before{content:"ⓘ";font-size:11px;color:var(--muted);margin-left:5px;font-weight:700}
+  .tip:hover::after{content:attr(data-tip);position:absolute;right:0;top:130%;white-space:pre-line;width:340px;background:#1d1b16;color:#f4efe6;padding:10px 12px;font-size:12px;line-height:1.4;border-radius:5px;z-index:30;font-weight:500;box-shadow:0 6px 20px rgba(0,0,0,.3);text-transform:none;letter-spacing:0;text-align:left}
   .legend{font-size:12px;color:var(--muted);margin-top:18px}
-</style>
-</head>
-<body>
-<main>
+</style></head>
+<body><main>
   <h1>Week 4 — who did best</h1>
-  <p class="lead">Labels once on the left, repos across the top: scan a row for the metric winner (★), a band
-  for the category winner (🏆). "Best" is <strong>trust-weighted</strong> — a reported-math number can't outrank
-  artifact-backed evidence. Hover any <span style="color:var(--muted)">ⓘ</span> for the measure and the pros.</p>
+  <p class="lead">Scan a row for the metric winner (★), a band for the category winner (🏆). Ranking is
+  <strong>trust-gated and verification beats self-report</strong>: a <span class="vbadge">verified</span> band was
+  measured by the harness; a <span class="ubadge">self-reported</span> one was not. Type-safety cells show
+  <strong>remaining violations</strong> (fewer is better) the harness counted with the TS compiler. Hover any
+  <span style="color:var(--muted)">ⓘ</span> for the measure + pros.</p>
 
   <div class="overall">
     <span class="lbl">Overall lead</span>
     <span class="who">michaelhabermas 🏆</span>
-    <span class="prov tip" data-tip="BEST BY: categories led on artifact-backed evidence (tie-break: artifact-backed metric wins).&#10;&#10;PROS — michaelhabermas&#10;• Leads 1 category on artifact evidence.&#10;• 4 artifact-backed metric wins across the week.&#10;&#10;CAVEAT&#10;• Provisional — nothing reproduced from a clean clone yet.&#10;• Repos with bigger raw numbers on reported-math evidence are not counted ahead of verified ones.">provisional</span>
+    <span class="prov tip" data-tip="BEST BY: categories led, weighted by evidence strength (verified &gt; artifact &gt; reported).&#10;Leading a VERIFIED category outranks leading an unverified one.&#10;&#10;PROS — michaelhabermas&#10;• Leads: Type Safety.&#10;• 2 metric wins across the week.&#10;&#10;CAVEAT&#10;• Only Type Safety is harness-verified so far; Bundle Size is still self-reported.&#10;• % reduction is pending a verified baseline.">provisional</span>
   </div>
 
-  <table>
-    <thead><tr><th class="metrichead">metric</th><th class='repohead'>michaelhabermas</th><th class='repohead'>daltondinderman</th><th class='repohead'>shivkanthalu</th></tr></thead>
-    <tbody><tr class='catrow'><td colspan='4'><span class='catname'>Type Safety</span><span class='catbest tip' data-tip='BEST BY: largest artifact-backed reduction clearing the 25% target.&#10;&#10;PROS — michaelhabermas&#10;• Leads 4 of 5 measured sub-metrics on the top trust tier.&#10;• Only top-tier repo to move: as casts.&#10;• WHY NOT shivkanthalu: reports 100% but on reported-math only.&#10;Note: Baseline counts are report_extracted; latest counts are artifact_parsed (AST). Confirm same counter.'>🏆 michaelhabermas</span></td></tr><tr><td class='mlabel'>total (any + as + !)</td><td class='cell best'><span class='star'>★</span> <span class='num down'>55.7%↓</span> <span class='rung art'>art</span> <span class='j j-q'>?</span></td><td class='cell'><span class='num down'>33.4%↓</span> <span class='rung art'>art</span> <span class='j j-q'>?</span></td><td class='cell'><span class='num down'>100.0%↓</span> <span class='rung md'>md</span> <span class='j j-q'>?</span></td></tr><tr><td class='mlabel'>explicit any</td><td class='cell best'><span class='star'>★</span> <span class='num down'>98.9%↓</span> <span class='rung art'>art</span> <span class='j j-ok'>✓</span></td><td class='cell'><span class='num down'>31.2%↓</span> <span class='rung art'>art</span> <span class='j j-q'>?</span></td><td class='cell'><span class='num down'>100.0%↓</span> <span class='rung md'>md</span> <span class='j j-q'>?</span></td></tr><tr><td class='mlabel'>as casts</td><td class='cell best'><span class='star'>★</span> <span class='num down'>26.2%↓</span> <span class='rung art'>art</span> <span class='j j-ok'>✓</span></td><td class='cell'><span class='num flat'>0% flat</span> <span class='rung art'>art</span> <span class='j j-x'>✗</span></td><td class='cell'><span class='num down'>100.0%↓</span> <span class='rung md'>md</span> <span class='j j-q'>?</span></td></tr><tr><td class='mlabel'>non-null !</td><td class='cell best'><span class='star'>★</span> <span class='num down'>88.9%↓</span> <span class='rung art'>art</span> <span class='j j-q'>?</span></td><td class='cell best'><span class='star'>★</span> <span class='num down'>85.8%↓</span> <span class='rung art'>art</span> <span class='j j-q'>?</span></td><td class='cell'><span class='num down'>100.0%↓</span> <span class='rung md'>md</span> <span class='j j-q'>?</span></td></tr><tr><td class='mlabel'>untyped params</td><td class='cell na'>—</td><td class='cell'><span class='num flat'>0% flat</span> <span class='rung art'>art</span> <span class='j j-x'>✗</span></td><td class='cell na'>—</td></tr><tr><td class='mlabel'>strict mode</td><td class='cell'><span class='num'>on</span> <span class='rung art'>art</span></td><td class='cell'><span class='num'>on</span> <span class='rung art'>art</span></td><td class='cell'><span class='num'>on</span> <span class='rung art'>art</span></td></tr><tr class='catrow'><td colspan='4'><span class='catname'>Bundle Size</span><span class='catbest tip' data-tip='BEST BY: highest artifact-backed reduction on a passing spec path.&#10;&#10;PROS — daltondinderman&#10;• Leads 1 of 2 measured sub-metrics on the top trust tier.&#10;Note: Total dist and total JS both increased in the submitted artifacts.'>🏆 daltondinderman</span></td></tr><tr><td class='mlabel'>total bundle</td><td class='cell'><span class='num flat'>-4.7%</span> <span class='rung art'>art</span> <span class='j j-x'>✗</span></td><td class='cell'><span class='num flat'>-0.7%</span> <span class='rung art'>art</span> <span class='j j-x'>✗</span></td><td class='cell best'><span class='star'>★</span> <span class='num down'>30.2%↓</span> <span class='rung md'>md</span> <span class='j j-q'>?</span></td></tr><tr><td class='mlabel'>initial load</td><td class='cell'><span class='num down'>73.9%↓</span> <span class='rung art'>art</span> <span class='j j-q'>?</span></td><td class='cell best'><span class='star'>★</span> <span class='num down'>86.1%↓</span> <span class='rung art'>art</span> <span class='j j-ok'>✓</span></td><td class='cell'><span class='num down'>84.2%↓</span> <span class='rung md'>md</span> <span class='j j-q'>?</span></td></tr></tbody>
-  </table>
+  <table><thead><tr><th class="metrichead">metric</th><th class='repohead'>michaelhabermas</th><th class='repohead'>daltondinderman</th><th class='repohead'>shivkanthalu</th></tr></thead>
+  <tbody><tr class='catrow'><td colspan='4'><span class='catname'>Type Safety</span> <span class='vbadge'>verified</span><span class='catbest tip' data-tip='BEST BY: fewest verified remaining violations — the harness counted them with the TypeScript&#10;compiler, the same way for every repo. (% reduction pending a verified baseline.)&#10;&#10;PROS — michaelhabermas&#10;• Fewest remaining of any repo: 333 total.&#10;• Wins 2 of 5 measured sub-metrics on verified evidence.&#10;WHY NOT shivkanthalu: self-reported 0 but the compiler finds 629. Self-report rejected.'>🏆 michaelhabermas <span class='prov'>(prov.)</span></span></td></tr><tr><td class='mlabel'>total (any + as + !)</td><td class='cell best' title='claimed after 409, verified 333'><span class='star'>★</span> <span class='num down'>333 left</span> <span class='rung ver'>ver</span> <span class='j j-q'>?</span> <span class='flagmark' title='self-report rejected'>⚠</span></td><td class='cell' title='claimed after 616, verified 564'><span class='num down'>564 left</span> <span class='rung ver'>ver</span> <span class='j j-q'>?</span></td><td class='cell' title='claimed after 0, verified 629'><span class='num down'>629 left</span> <span class='rung ver'>ver</span> <span class='j j-q'>?</span> <span class='flagmark' title='self-report rejected'>⚠</span></td></tr><tr><td class='mlabel'>explicit any</td><td class='cell' title='claimed after 1, verified 12'><span class='num down'>12 left</span> <span class='rung ver'>ver</span> <span class='j j-ok'>✓</span></td><td class='cell' title='claimed after 66, verified 66'><span class='num down'>66 left</span> <span class='rung ver'>ver</span> <span class='j j-q'>?</span></td><td class='cell best' title='claimed after 0, verified 0'><span class='star'>★</span> <span class='num down'>0 left</span> <span class='rung ver'>ver</span> <span class='j j-q'>?</span></td></tr><tr><td class='mlabel'>as casts</td><td class='cell best' title='claimed after 372, verified 284'><span class='star'>★</span> <span class='num down'>284 left</span> <span class='rung ver'>ver</span> <span class='j j-ok'>✓</span> <span class='flagmark' title='self-report rejected'>⚠</span></td><td class='cell' title='claimed after 504, verified 451'><span class='num down'>451 left</span> <span class='rung ver'>ver</span> <span class='j j-x'>✗</span></td><td class='cell' title='claimed after 0, verified 628'><span class='num down'>628 left</span> <span class='rung ver'>ver</span> <span class='j j-q'>?</span> <span class='flagmark' title='self-report rejected'>⚠</span></td></tr><tr><td class='mlabel'>non-null !</td><td class='cell' title='claimed after 36, verified 37'><span class='num down'>37 left</span> <span class='rung ver'>ver</span> <span class='j j-q'>?</span></td><td class='cell' title='claimed after 46, verified 47'><span class='num down'>47 left</span> <span class='rung ver'>ver</span> <span class='j j-q'>?</span></td><td class='cell best' title='claimed after 0, verified 1'><span class='star'>★</span> <span class='num down'>1 left</span> <span class='rung ver'>ver</span> <span class='j j-q'>?</span></td></tr><tr><td class='mlabel'>untyped params</td><td class='cell na'>—</td><td class='cell'><span class='num flat'>0% flat</span> <span class='rung art'>art</span> <span class='j j-x'>✗</span></td><td class='cell na'>—</td></tr><tr><td class='mlabel'>strict mode</td><td class='cell'><span class='num'>on</span> <span class='rung art'>art</span></td><td class='cell'><span class='num'>on</span> <span class='rung art'>art</span></td><td class='cell'><span class='num'>on</span> <span class='rung art'>art</span></td></tr><tr class='catrow'><td colspan='4'><span class='catname'>Bundle Size</span> <span class='ubadge'>self-reported</span><span class='catbest tip' data-tip='BEST BY: clearing the most of the category goal (spec allows either path — doing both is more), then total reduction.&#10;UNVERIFIED — self-reported; the harness has not built these bundles.&#10;&#10;PROS — shivkanthalu&#10;• Cleared 2 of 2 paths: total bundle 30.2%↓ AND initial load 84.2%↓.&#10;• michaelhabermas cleared 1 path(s) only.&#10;• daltondinderman cleared 1 path(s) only.&#10;&#10;CAVEAT&#10;• All bundle numbers are self-reported; no independent build yet.&#10;• Self-reports were wrong this week — type-safety claims got rejected on verification — so verify before trusting.'>🏆 shivkanthalu <span class='prov'>(prov.)</span></span></td></tr><tr><td class='mlabel'>total bundle</td><td class='cell'><span class='num flat'>-4.7%</span> <span class='rung art'>art</span> <span class='j j-x'>✗</span></td><td class='cell'><span class='num flat'>-0.7%</span> <span class='rung art'>art</span> <span class='j j-x'>✗</span></td><td class='cell best'><span class='star'>★</span> <span class='num down'>30.2%↓</span> <span class='rung md'>md</span> <span class='j j-q'>?</span></td></tr><tr><td class='mlabel'>initial load</td><td class='cell'><span class='num down'>73.9%↓</span> <span class='rung art'>art</span> <span class='j j-q'>?</span></td><td class='cell best'><span class='star'>★</span> <span class='num down'>86.1%↓</span> <span class='rung art'>art</span> <span class='j j-ok'>✓</span></td><td class='cell'><span class='num down'>84.2%↓</span> <span class='rung md'>md</span> <span class='j j-q'>?</span></td></tr></tbody></table>
 
   <p class="legend">
-    ★ best in row (trust-weighted, ties within 4 pts shown together) &nbsp;·&nbsp; 🏆 best in category &nbsp;·&nbsp;
-    rung: <span class="rung art">art</span> artifact-backed, <span class="rung md">md</span> reported-math &nbsp;·&nbsp;
-    judgment: <span class="j j-ok">✓</span> meaningful, <span class="j j-q">?</span> needs judgment, <span class="j j-x">✗</span> not addressed &nbsp;·&nbsp;
-    hover <span style="color:var(--muted)">ⓘ</span> for "best by what measure" + pros
+    ★ best in row (trust-gated) &nbsp;·&nbsp; 🏆 best in category &nbsp;·&nbsp;
+    rung: <span class="rung ver">ver</span> harness-verified, <span class="rung art">art</span> artifact, <span class="rung md">md</span> reported-math &nbsp;·&nbsp;
+    <span class="flagmark">⚠</span> self-report rejected &nbsp;·&nbsp; hover <span style="color:var(--muted)">ⓘ</span> for measure + pros
   </p>
-</main>
-</body>
-</html>
+</main></body></html>

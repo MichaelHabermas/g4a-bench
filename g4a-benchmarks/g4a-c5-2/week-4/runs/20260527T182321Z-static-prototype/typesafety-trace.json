@@ -1,0 +1,484 @@
+{
+  "artifact_kind": "type_safety_process_trace",
+  "criterion": {
+    "id": "type-safety",
+    "name": "Type Safety",
+    "unit": "violations",
+    "combine": "headline",
+    "headline_part": "total",
+    "threshold_percent": 25
+  },
+  "part_defs": [
+    {
+      "id": "total",
+      "label": "total (any + as + !)",
+      "headline": true,
+      "threshold": ">= 25% reduction"
+    },
+    {
+      "id": "any",
+      "label": "explicit any"
+    },
+    {
+      "id": "as",
+      "label": "as casts"
+    },
+    {
+      "id": "nonnull",
+      "label": "non-null !"
+    },
+    {
+      "id": "untyped",
+      "label": "untyped params"
+    },
+    {
+      "id": "strict",
+      "label": "strict mode",
+      "kind": "boolean"
+    }
+  ],
+  "gate_defs": [
+    {
+      "id": "functionality_preserved",
+      "label": "Functionality preserved (tests pass)"
+    },
+    {
+      "id": "fixes_meaningful",
+      "label": "Fixes meaningful (not superficial)"
+    },
+    {
+      "id": "counting_comparable",
+      "label": "Counting comparable (same instrument/scope)"
+    }
+  ],
+  "run_dir": "/Users/michaelhabermas/repos/GAI/g4a-bench/g4a-benchmarks/g4a-c5-2/week-4/runs/20260527T182321Z-static-prototype",
+  "run_id": "20260527T182321Z-static-prototype",
+  "scope_note": "Generalized evaluator trace pointed at Category 1, decomposed into parts. Production basis = any + as + non-null over api/web/shared excluding tests.",
+  "spec_excerpt": "Category 1: Type Safety. Count explicit any, `as` assertions, non-null `!`, @ts-ignore, untyped params; check strict mode. Target: eliminate 25% of violations. Every fix must preserve functionality. Superficial fixes and any->unknown without narrowing do not count.",
+  "spec_source": "g4a-specs/g4a-c5-2/week-4/GFA-Week-4-ShipShape.txt",
+  "teams": [
+    {
+      "team": "github-com-michaelhabermas-ship-shape",
+      "team_shape": "structured_ledger_with_artifact_pointers",
+      "commit_sha": "e5fed89d6c053094fbcc53d8c301dc3f98c330a2",
+      "repo_url": "https://github.com/MichaelHabermas/ship-shape",
+      "trust": "artifact-backed",
+      "claim_text": [
+        "Production type-safety violations (any + as + !) reduced 923 -> 409 (55.7%), clearing the 25% target, with all three classes down."
+      ],
+      "caveats": [
+        "Baseline counts are report_extracted; latest counts are artifact_parsed (AST). Confirm same counter.",
+        "Reduction spans all three classes, including `as` casts (504 -> 372) \u2014 harder to fake than a single-bucket win."
+      ],
+      "primary_evidence": [
+        "my-docs/evidence/submission-ledger.json#categories[0]",
+        "scripts/type-safety-counts.mjs"
+      ],
+      "evidence_states": [
+        {
+          "name": "claim_found",
+          "value": "yes",
+          "note": "Ledger category cat-1-type-safety."
+        },
+        {
+          "name": "artifact_backed",
+          "value": "yes",
+          "note": "Baseline + latest AST counts with package breakdown."
+        },
+        {
+          "name": "machine_readable_before_after",
+          "value": "yes",
+          "note": "Counts extractable as numbers."
+        },
+        {
+          "name": "path_choice_explicit",
+          "value": "yes",
+          "note": "25% target stated directly."
+        },
+        {
+          "name": "independently_reproduced",
+          "value": "no",
+          "note": "Counter/test suite not rerun."
+        },
+        {
+          "name": "comparability",
+          "value": "plausible_not_verified",
+          "note": "Production AST baseline (923) matches Dalton's (925)."
+        }
+      ],
+      "provisional_judgment": {
+        "state": "artifact_math_passes",
+        "summary": "Broad-based reduction clears 25% on artifacts; gates need judgment."
+      },
+      "judgment_gates": [
+        {
+          "id": "functionality_preserved",
+          "state": "claimed",
+          "note": "Ledger status 'proven' + pnpm-test log; not rerun."
+        },
+        {
+          "id": "fixes_meaningful",
+          "state": "needs_review",
+          "note": "Across-the-board reduction lowers superficiality risk, but narrowing quality unverified."
+        },
+        {
+          "id": "counting_comparable",
+          "state": "pass",
+          "note": "Production AST; baseline converges with Dalton."
+        }
+      ],
+      "next_judgments": [
+        {
+          "judgment": "trust_level",
+          "state": "artifact_backed_not_reproduced",
+          "why": "AST counts support the claim; final confidence needs a clean-clone rerun."
+        },
+        {
+          "judgment": "superficiality_check",
+          "state": "lower_risk",
+          "why": "Reducing `as` casts and `any` together is harder to game than removing only non-null assertions."
+        }
+      ],
+      "agent_questions": [
+        "Were the removed `as` casts replaced with meaningful narrowing?",
+        "Did the test suite actually pass at the latest commit?"
+      ],
+      "parts": {
+        "total": {
+          "before": 923,
+          "after": 409,
+          "judgment": "needs_review",
+          "reduction_percent": 55.69
+        },
+        "any": {
+          "before": 94,
+          "after": 1,
+          "judgment": "meaningful",
+          "reduction_percent": 98.94
+        },
+        "as": {
+          "before": 504,
+          "after": 372,
+          "judgment": "meaningful",
+          "reduction_percent": 26.19
+        },
+        "nonnull": {
+          "before": 325,
+          "after": 36,
+          "judgment": "needs_review",
+          "reduction_percent": 88.92
+        },
+        "untyped": {
+          "value": null,
+          "judgment": "not_claimed",
+          "reduction_percent": null
+        },
+        "strict": {
+          "value": "on",
+          "kind": "boolean",
+          "trust": "artifact-backed",
+          "judgment": "neutral",
+          "reduction_percent": null
+        }
+      },
+      "target_paths": [
+        {
+          "id": "violation-reduction",
+          "before": 923,
+          "after": 409,
+          "unit": "violations",
+          "reduction_percent": 55.69,
+          "spec_threshold": ">= 25% reduction",
+          "interpretation": "Valid only if fixes preserve functionality and are not superficial.",
+          "state": "passes_artifact_math"
+        }
+      ],
+      "discovery_inventory": {
+        "evidence_files": 2
+      }
+    },
+    {
+      "team": "labs-gauntletai-com-daltondinderman-shipshape",
+      "team_shape": "before_after_count_json_with_delta_markdown",
+      "commit_sha": "7f394f245cd70949d05112c4dcbd02719982e56c",
+      "repo_url": "(gauntlet labs submission)",
+      "trust": "artifact-backed",
+      "claim_text": [
+        "Production type-safety violations reduced 925 -> 616 (33.4%), clearing the 25% target."
+      ],
+      "caveats": [
+        "The reduction is concentrated: non-null 325 -> 46 and some any (96 -> 66).",
+        "`as` casts (504) and untyped params (1371) \u2014 the two largest buckets \u2014 are unchanged."
+      ],
+      "primary_evidence": [
+        "docs/category-improvements/evidence/01-type-safety/before-type-safety-counts.json",
+        "docs/category-improvements/evidence/01-type-safety/after-type-safety-counts.json",
+        "docs/category-improvements/evidence/01-type-safety/type-safety-delta.md"
+      ],
+      "evidence_states": [
+        {
+          "name": "claim_found",
+          "value": "yes",
+          "note": "Delta markdown states passed vs 25%."
+        },
+        {
+          "name": "artifact_backed",
+          "value": "yes",
+          "note": "Distinct before/after count JSON."
+        },
+        {
+          "name": "machine_readable_before_after",
+          "value": "yes",
+          "note": "production.primaryTotal extractable."
+        },
+        {
+          "name": "path_choice_explicit",
+          "value": "yes",
+          "note": "25% target, explicit."
+        },
+        {
+          "name": "independently_reproduced",
+          "value": "no",
+          "note": "Scan/regression not rerun."
+        },
+        {
+          "name": "comparability",
+          "value": "plausible_not_verified",
+          "note": "Production AST; baseline (925) matches Michael (923)."
+        }
+      ],
+      "provisional_judgment": {
+        "state": "artifact_math_passes",
+        "summary": "Clears 25%, but the win is narrow \u2014 almost all non-null assertions."
+      },
+      "judgment_gates": [
+        {
+          "id": "functionality_preserved",
+          "state": "needs_review",
+          "note": "Full-regression run dir exists; not replayed."
+        },
+        {
+          "id": "fixes_meaningful",
+          "state": "needs_review",
+          "note": "Concentrated in non-null; `as` (largest bucket) untouched. Real null-safety or assertion churn?"
+        },
+        {
+          "id": "counting_comparable",
+          "state": "pass",
+          "note": "Production AST; baseline converges with Michael."
+        }
+      ],
+      "next_judgments": [
+        {
+          "judgment": "trust_level",
+          "state": "artifact_backed_not_reproduced",
+          "why": "Before/after pair is strong; may both derive from current state."
+        },
+        {
+          "judgment": "superficiality_check",
+          "state": "concentration_risk",
+          "why": "A reduction dominated by non-null warrants checking real null checks vs optional chaining."
+        }
+      ],
+      "agent_questions": [
+        "Were 279 removed non-null assertions replaced with real null checks?",
+        "Why are `as` casts (504) completely unchanged?"
+      ],
+      "parts": {
+        "total": {
+          "before": 925,
+          "after": 616,
+          "judgment": "needs_review",
+          "reduction_percent": 33.41
+        },
+        "any": {
+          "before": 96,
+          "after": 66,
+          "judgment": "needs_review",
+          "reduction_percent": 31.25
+        },
+        "as": {
+          "before": 504,
+          "after": 504,
+          "judgment": "not_addressed",
+          "reduction_percent": 0.0
+        },
+        "nonnull": {
+          "before": 325,
+          "after": 46,
+          "judgment": "needs_review",
+          "reduction_percent": 85.85
+        },
+        "untyped": {
+          "before": 1371,
+          "after": 1371,
+          "judgment": "not_addressed",
+          "reduction_percent": 0.0
+        },
+        "strict": {
+          "value": "on",
+          "kind": "boolean",
+          "trust": "artifact-backed",
+          "judgment": "neutral",
+          "reduction_percent": null
+        }
+      },
+      "target_paths": [
+        {
+          "id": "violation-reduction",
+          "before": 925,
+          "after": 616,
+          "unit": "violations",
+          "reduction_percent": 33.41,
+          "spec_threshold": ">= 25% reduction",
+          "interpretation": "Valid only if fixes preserve functionality and are not superficial.",
+          "state": "passes_artifact_math"
+        }
+      ],
+      "discovery_inventory": {
+        "evidence_files": 3
+      }
+    },
+    {
+      "team": "labs-gauntletai-com-shivkanthalu-ship",
+      "team_shape": "markdown_audit_report_single_pass",
+      "commit_sha": "(submission commit)",
+      "repo_url": "(gauntlet labs submission)",
+      "trust": "reported-math",
+      "claim_text": [
+        "All 1,219 type violations eliminated in a single pass on 2026-05-21; type-check passes, 502 tests pass."
+      ],
+      "caveats": [
+        "Counts from ESLint over src including tests \u2014 different instrument/scope than the AST repos.",
+        "Baseline 1,219 is not comparable to the production-AST baseline (~924).",
+        "1,219 -> 0 in one pass is the most extreme reported outcome and the least independently supported."
+      ],
+      "primary_evidence": [
+        "docs/audit/category-1-type-safety.md"
+      ],
+      "evidence_states": [
+        {
+          "name": "claim_found",
+          "value": "yes",
+          "note": "Markdown scorecard claims total elimination."
+        },
+        {
+          "name": "artifact_backed",
+          "value": "markdown_backed",
+          "note": "Counts in Markdown tables; no committed before/after JSON."
+        },
+        {
+          "name": "machine_readable_before_after",
+          "value": "no",
+          "note": "No recognized count JSON."
+        },
+        {
+          "name": "path_choice_explicit",
+          "value": "yes",
+          "note": "25% target; claims 100%."
+        },
+        {
+          "name": "independently_reproduced",
+          "value": "no",
+          "note": "ESLint/type-check/tests not rerun."
+        },
+        {
+          "name": "comparability",
+          "value": "needs_agent_review",
+          "note": "Different instrument/scope; baseline magnitude differs."
+        }
+      ],
+      "provisional_judgment": {
+        "state": "markdown_math_passes_pending_artifacts",
+        "summary": "Reports 100% on the lowest trust rung; extraordinary claim, weakest support."
+      },
+      "judgment_gates": [
+        {
+          "id": "functionality_preserved",
+          "state": "claimed",
+          "note": "Markdown asserts 502 tests + clean type-check; not reproduced."
+        },
+        {
+          "id": "fixes_meaningful",
+          "state": "needs_review",
+          "note": "1,219 -> 0 in one pass is the highest superficiality risk in the cohort."
+        },
+        {
+          "id": "counting_comparable",
+          "state": "fail",
+          "note": "ESLint+tests scope; baseline 1,219 not comparable to ~924."
+        }
+      ],
+      "next_judgments": [
+        {
+          "judgment": "trust_level",
+          "state": "markdown_only_pending_artifacts",
+          "why": "Generate ESLint JSON + committed before/after to move off prose."
+        },
+        {
+          "judgment": "superficiality_check",
+          "state": "high_risk",
+          "why": "Total elimination in one pass is the strongest candidate for spot-checking fixes."
+        }
+      ],
+      "agent_questions": [
+        "Does ESLint actually report 0 at the submission commit?",
+        "Were 619 `as` casts replaced with real types, or with `as unknown as` / disabled rules?",
+        "What does the production-AST counter report, for comparison with 923/925?"
+      ],
+      "parts": {
+        "total": {
+          "before": 1219,
+          "after": 0,
+          "judgment": "needs_review",
+          "reduction_percent": 100.0
+        },
+        "any": {
+          "before": 271,
+          "after": 0,
+          "judgment": "needs_review",
+          "reduction_percent": 100.0
+        },
+        "as": {
+          "before": 619,
+          "after": 0,
+          "judgment": "needs_review",
+          "reduction_percent": 100.0
+        },
+        "nonnull": {
+          "before": 329,
+          "after": 0,
+          "judgment": "needs_review",
+          "reduction_percent": 100.0
+        },
+        "untyped": {
+          "value": null,
+          "judgment": "not_claimed",
+          "reduction_percent": null
+        },
+        "strict": {
+          "value": "on",
+          "kind": "boolean",
+          "trust": "artifact-backed",
+          "judgment": "neutral",
+          "reduction_percent": null
+        }
+      },
+      "target_paths": [
+        {
+          "id": "violation-reduction",
+          "before": 1219,
+          "after": 0,
+          "unit": "violations",
+          "reduction_percent": 100.0,
+          "spec_threshold": ">= 25% reduction",
+          "interpretation": "Valid only if fixes preserve functionality and are not superficial.",
+          "state": "passes_markdown_math"
+        }
+      ],
+      "discovery_inventory": {
+        "evidence_files": 1
+      }
+    }
+  ]
+}

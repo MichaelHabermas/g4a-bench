@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Layout options — category fan-out</title>
+<style>
+  :root{
+    --ink:#191919;--muted:#6b655d;--paper:#f5f1e9;--panel:#fffdf8;--line:#d6cdbf;
+    --good:#1c6b54;--good-bg:#e6f3ec;--bad:#9c2f25;--bad-bg:#f8e1de;
+    --grey:#7c756b;--grey-bg:#ece7dd;--blue:#274f7f;--warn:#9a5a10;--warn-bg:#fdf0d8;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.4}
+  main{max-width:1240px;margin:0 auto;padding:24px 20px 80px}
+  h1{font-size:34px;margin:0 0 4px}
+  h2{font-size:22px;margin:0 0 4px}
+  h3{font-size:15px;margin:0 0 8px}
+  .lead{color:var(--muted);max-width:820px;margin:0 0 8px}
+  .nav{position:sticky;top:0;background:var(--paper);padding:12px 0;border-bottom:1px solid var(--line);display:flex;gap:8px;z-index:5;margin-bottom:8px}
+  .nav a{text-decoration:none;border:1px solid var(--line);background:#ebe3d6;color:var(--ink);padding:7px 13px;font-weight:750;font-size:13px}
+  .opt{background:var(--panel);border:1px solid var(--line);padding:22px;margin:22px 0}
+  .tag{display:inline-block;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--blue);border:1px solid var(--blue);padding:2px 7px;margin-bottom:8px}
+  .trade{font-size:13px;color:var(--muted);margin:6px 0 18px;max-width:840px}
+  .good-t{color:var(--good);font-weight:700}.bad-t{color:var(--bad);font-weight:700}
+
+  /* shared cell vocab */
+  .rung{display:inline-block;font-size:10px;font-weight:700;padding:1px 6px;border-radius:9px;border:1px solid currentColor}
+  .art{color:#274f7f;background:#e4ecf6}.md{color:#9a5a10;background:#fdf0d8}
+  .j{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:17px;font-size:11px;font-weight:800;border:1px solid currentColor;border-radius:3px;margin-left:3px}
+  .j-ok{color:var(--good);background:var(--good-bg)}.j-q{color:var(--warn);background:var(--warn-bg)}.j-x{color:var(--bad);background:var(--bad-bg)}
+  .down{color:var(--good);font-weight:800}.flat{color:var(--bad);font-weight:800}.na{color:var(--grey)}
+
+  /* A: rollup + expand */
+  table{border-collapse:separate;border-spacing:5px}
+  .roll th,.roll td{border:1px solid var(--line);padding:8px 11px;text-align:left;vertical-align:top}
+  .roll thead th{background:#ece4d7}
+  .roll .rh{background:#ece4d7;font-weight:700}
+  .rollcell{min-width:130px;cursor:pointer}
+  .spread{font-weight:800;font-size:14px}
+  .segbar{display:flex;height:7px;margin-top:6px;border:1px solid var(--line)}
+  .seg-ok{background:var(--good)}.seg-q{background:var(--warn)}.seg-x{background:var(--bad)}.seg-na{background:#d8d0c2}
+  .crumb{font-size:12px;color:var(--muted);margin:18px 0 6px}
+  .sub th,.sub td{border:1px solid var(--line);padding:7px 10px;text-align:left}
+  .sub thead th{background:#eee6da;font-size:12px}
+  .sub .rh{background:#eee6da;font-weight:700}
+  .subcell{min-width:96px}.subnum{font-size:16px;font-weight:800}
+  .hint{font-size:12px;color:var(--muted);margin-top:10px}
+
+  /* B: flat wide */
+  .flatwrap{overflow-x:auto;border:1px solid var(--line)}
+  table.flatm{border-spacing:0;min-width:1100px}
+  .flatm th,.flatm td{border:1px solid var(--line);padding:6px 8px;text-align:center;font-size:12px;white-space:nowrap}
+  .flatm thead .grp{background:#ddd3c2;font-weight:800;text-transform:uppercase;font-size:10px;letter-spacing:.05em}
+  .flatm thead .sub{background:#ece4d7;font-weight:700}
+  .flatm .rh{background:#ece4d7;font-weight:700;text-align:left;position:sticky;left:0}
+
+  /* C: scorecards */
+  .cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+  .card{border:1px solid var(--line);background:#fffaf1;padding:14px}
+  .card h3{margin:0 0 10px;border-bottom:2px solid var(--ink);padding-bottom:6px}
+  .sect{margin:12px 0 4px;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);display:flex;justify-content:space-between}
+  .sect .verdict{color:var(--good);font-weight:800}
+  .mrow{display:flex;align-items:center;gap:8px;font-size:13px;padding:4px 0;border-bottom:1px dotted var(--line)}
+  .mrow .nm{width:70px;color:var(--muted)}
+  .mrow .vn{width:54px;font-weight:800;text-align:right}
+  @media(max-width:820px){.cards{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<main>
+  <h1>Three ways to show a category that fans out</h1>
+  <p class="lead">Placeholder data. Specimen category = <strong>Type Safety</strong>, fanned into its parts
+  (<code>any</code>, <code>as</code> casts, non-null <code>!</code>, <code>@ts-ignore</code>, untyped params, strict mode),
+  plus <strong>Bundle Size</strong> for contrast. Each cell carries reduction · trust rung
+  (<span class="rung art">art</span>=artifact, <span class="rung md">md</span>=reported-math) · a judgment chip
+  (<span class="j j-ok">✓</span> meaningful, <span class="j j-q">?</span> needs judgment, <span class="j j-x">✗</span> superficial/contested).</p>
+
+  <div class="nav">
+    <a href="#a">A · Progressive disclosure</a>
+    <a href="#b">B · Flat matrix</a>
+    <a href="#c">C · Per-repo scorecards</a>
+  </div>
+
+  <!-- ============ OPTION A ============ -->
+  <section class="opt" id="a">
+    <span class="tag">Option A</span>
+    <h2>Progressive disclosure — whole → parts → evidence</h2>
+    <p class="trade"><span class="good-t">Scales to a full week.</span> You start at category rollups (the whole), expand one category into its sub-metric matrix (the parts), then click a cell for evidence + judgment. <span class="bad-t">Costs a click</span> to see detail. Rollup never averages — it shows the spread.</p>
+
+    <h3>Altitude 1 — week rollup (one cell per repo × category)</h3>
+    <table class="roll">
+      <thead><tr><th class="rh">repo \ category</th><th>Type Safety</th><th>Bundle Size</th><th>API Resp.</th><th>DB Queries</th></tr></thead>
+      <tbody>
+        <tr><th class="rh">michael</th>
+          <td class="rollcell"><span class="spread">4/6 improved</span> · 2 <span class="j j-q">?</span><div class="segbar"><i class="seg-ok" style="flex:4"></i><i class="seg-q" style="flex:2"></i></div></td>
+          <td class="rollcell"><span class="spread">1/2 paths</span> · initial only<div class="segbar"><i class="seg-ok" style="flex:1"></i><i class="seg-x" style="flex:1"></i></div></td>
+          <td class="rollcell na">— not yet</td><td class="rollcell na">— not yet</td></tr>
+        <tr><th class="rh">dalton</th>
+          <td class="rollcell"><span class="spread">3/6 improved</span> · 3 <span class="j j-q">?</span><div class="segbar"><i class="seg-ok" style="flex:3"></i><i class="seg-q" style="flex:2"></i><i class="seg-x" style="flex:1"></i></div></td>
+          <td class="rollcell"><span class="spread">1/2 paths</span> · initial only<div class="segbar"><i class="seg-ok" style="flex:1"></i><i class="seg-x" style="flex:1"></i></div></td>
+          <td class="rollcell na">— not yet</td><td class="rollcell na">— not yet</td></tr>
+        <tr><th class="rh">shiv</th>
+          <td class="rollcell"><span class="spread">6/6 reported</span> · 5 <span class="j j-q">?</span> · <span class="md rung">all md</span><div class="segbar"><i class="seg-q" style="flex:6"></i></div></td>
+          <td class="rollcell"><span class="spread">2/2 paths</span> · <span class="md rung">md</span><div class="segbar"><i class="seg-q" style="flex:2"></i></div></td>
+          <td class="rollcell na">— not yet</td><td class="rollcell na">— not yet</td></tr>
+      </tbody>
+    </table>
+
+    <div class="crumb">▼ clicked <strong>Type Safety</strong> — Altitude 2: sub-metric matrix (the parts)</div>
+    <table class="sub">
+      <thead><tr><th class="rh">repo \ violation</th><th>explicit any</th><th>as casts</th><th>non-null !</th><th>@ts-ignore</th><th>untyped params</th><th>strict mode</th></tr></thead>
+      <tbody>
+        <tr><th class="rh">michael</th>
+          <td class="subcell"><div class="subnum down">72% ↓</div><span class="rung art">art</span> <span class="j j-ok">✓</span></td>
+          <td class="subcell"><div class="subnum down">33% ↓</div><span class="rung art">art</span> <span class="j j-ok">✓</span></td>
+          <td class="subcell"><div class="subnum down">80% ↓</div><span class="rung art">art</span> <span class="j j-q">?</span></td>
+          <td class="subcell na">none</td>
+          <td class="subcell"><div class="subnum down">12% ↓</div><span class="rung art">art</span> <span class="j j-q">?</span></td>
+          <td class="subcell"><div class="subnum">on</div><span class="rung art">art</span> <span class="j j-ok">✓</span></td></tr>
+        <tr><th class="rh">dalton</th>
+          <td class="subcell"><div class="subnum down">31% ↓</div><span class="rung art">art</span> <span class="j j-q">?</span></td>
+          <td class="subcell"><div class="subnum flat">0% flat</div><span class="rung art">art</span> <span class="j j-x">✗</span></td>
+          <td class="subcell"><div class="subnum down">86% ↓</div><span class="rung art">art</span> <span class="j j-q">?</span></td>
+          <td class="subcell na">none</td>
+          <td class="subcell"><div class="subnum flat">0% flat</div><span class="rung art">art</span> <span class="j j-x">✗</span></td>
+          <td class="subcell"><div class="subnum">on</div><span class="rung art">art</span> <span class="j j-ok">✓</span></td></tr>
+        <tr><th class="rh">shiv</th>
+          <td class="subcell"><div class="subnum down">100% ↓</div><span class="rung md">md</span> <span class="j j-q">?</span></td>
+          <td class="subcell"><div class="subnum down">100% ↓</div><span class="rung md">md</span> <span class="j j-q">?</span></td>
+          <td class="subcell"><div class="subnum down">100% ↓</div><span class="rung md">md</span> <span class="j j-q">?</span></td>
+          <td class="subcell na">none</td>
+          <td class="subcell na">n/a</td>
+          <td class="subcell"><div class="subnum">on</div><span class="rung md">md</span> <span class="j j-q">?</span></td></tr>
+      </tbody>
+    </table>
+    <p class="hint">Click any sub-metric cell → Altitude 3 drawer: the exact fixes, the superficiality check, the agent question. (Drawer not mocked here.)</p>
+  </section>
+
+  <!-- ============ OPTION B ============ -->
+  <section class="opt" id="b">
+    <span class="tag">Option B</span>
+    <h2>Flat matrix — every sub-metric is a column</h2>
+    <p class="trade"><span class="good-t">Everything visible at once, no clicks.</span> Great for spotting one anomaly across the whole grid. <span class="bad-t">Drowns at week scale</span> — 8 categories × ~5 sub-metrics = 30-40 columns, horizontal scroll, and no whole/part structure. This is closest to the dump you didn't like.</p>
+    <div class="flatwrap">
+      <table class="flatm">
+        <thead>
+          <tr><th class="rh" rowspan="2">repo</th><th class="grp" colspan="6">Type Safety</th><th class="grp" colspan="2">Bundle</th><th class="grp" colspan="2">API</th></tr>
+          <tr><th class="sub">any</th><th class="sub">as</th><th class="sub">!</th><th class="sub">ts-ig</th><th class="sub">untyp</th><th class="sub">strict</th><th class="sub">total</th><th class="sub">initial</th><th class="sub">p95</th><th class="sub">p99</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="rh">michael</td><td><span class="down">72%↓</span></td><td><span class="down">33%↓</span></td><td><span class="down">80%↓</span></td><td class="na">—</td><td><span class="down">12%↓</span></td><td>on</td><td><span class="flat">-4.7%</span></td><td><span class="down">73.9%↓</span></td><td class="na">—</td><td class="na">—</td></tr>
+          <tr><td class="rh">dalton</td><td><span class="down">31%↓</span></td><td><span class="flat">0%</span></td><td><span class="down">86%↓</span></td><td class="na">—</td><td><span class="flat">0%</span></td><td>on</td><td><span class="flat">-0.7%</span></td><td><span class="down">86%↓</span></td><td class="na">—</td><td class="na">—</td></tr>
+          <tr><td class="rh">shiv</td><td><span class="down">100%↓</span></td><td><span class="down">100%↓</span></td><td><span class="down">100%↓</span></td><td class="na">—</td><td class="na">n/a</td><td>on</td><td><span class="down">30%↓</span></td><td><span class="down">84%↓</span></td><td class="na">—</td><td class="na">—</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="hint">Imagine this stretched across all 8 categories — the reason A and C add a layer on top of this.</p>
+  </section>
+
+  <!-- ============ OPTION C ============ -->
+  <section class="opt" id="c">
+    <span class="tag">Option C</span>
+    <h2>Per-repo scorecards — one card per repo</h2>
+    <p class="trade"><span class="good-t">Reads like a report card</span> — great for understanding one repo deeply, or handing a single team their results. <span class="bad-t">Cross-repo comparison is weaker</span>: to compare dalton's <code>as</code> work to shiv's you flip between cards instead of reading across a row.</p>
+    <div class="cards">
+      <div class="card">
+        <h3>michael</h3>
+        <div class="sect"><span>Type Safety</span><span class="verdict">4/6 ✓</span></div>
+        <div class="mrow"><span class="nm">any</span><span class="vn down">72%↓</span><span class="rung art">art</span><span class="j j-ok">✓</span></div>
+        <div class="mrow"><span class="nm">as casts</span><span class="vn down">33%↓</span><span class="rung art">art</span><span class="j j-ok">✓</span></div>
+        <div class="mrow"><span class="nm">non-null !</span><span class="vn down">80%↓</span><span class="rung art">art</span><span class="j j-q">?</span></div>
+        <div class="mrow"><span class="nm">untyped</span><span class="vn down">12%↓</span><span class="rung art">art</span><span class="j j-q">?</span></div>
+        <div class="mrow"><span class="nm">strict</span><span class="vn">on</span><span class="rung art">art</span><span class="j j-ok">✓</span></div>
+        <div class="sect"><span>Bundle Size</span><span class="verdict">initial ✓</span></div>
+        <div class="mrow"><span class="nm">total</span><span class="vn flat">-4.7%</span><span class="rung art">art</span><span class="j j-x">✗</span></div>
+        <div class="mrow"><span class="nm">initial</span><span class="vn down">73.9%↓</span><span class="rung art">art</span><span class="j j-ok">✓</span></div>
+      </div>
+      <div class="card">
+        <h3>dalton</h3>
+        <div class="sect"><span>Type Safety</span><span class="verdict">3/6 ?</span></div>
+        <div class="mrow"><span class="nm">any</span><span class="vn down">31%↓</span><span class="rung art">art</span><span class="j j-q">?</span></div>
+        <div class="mrow"><span class="nm">as casts</span><span class="vn flat">0%</span><span class="rung art">art</span><span class="j j-x">✗</span></div>
+        <div class="mrow"><span class="nm">non-null !</span><span class="vn down">86%↓</span><span class="rung art">art</span><span class="j j-q">?</span></div>
+        <div class="mrow"><span class="nm">untyped</span><span class="vn flat">0%</span><span class="rung art">art</span><span class="j j-x">✗</span></div>
+        <div class="mrow"><span class="nm">strict</span><span class="vn">on</span><span class="rung art">art</span><span class="j j-ok">✓</span></div>
+        <div class="sect"><span>Bundle Size</span><span class="verdict">initial ✓</span></div>
+        <div class="mrow"><span class="nm">total</span><span class="vn flat">-0.7%</span><span class="rung art">art</span><span class="j j-x">✗</span></div>
+        <div class="mrow"><span class="nm">initial</span><span class="vn down">86%↓</span><span class="rung art">art</span><span class="j j-ok">✓</span></div>
+      </div>
+      <div class="card">
+        <h3>shiv</h3>
+        <div class="sect"><span>Type Safety</span><span class="verdict" style="color:var(--warn)">6/6 md ?</span></div>
+        <div class="mrow"><span class="nm">any</span><span class="vn down">100%↓</span><span class="rung md">md</span><span class="j j-q">?</span></div>
+        <div class="mrow"><span class="nm">as casts</span><span class="vn down">100%↓</span><span class="rung md">md</span><span class="j j-q">?</span></div>
+        <div class="mrow"><span class="nm">non-null !</span><span class="vn down">100%↓</span><span class="rung md">md</span><span class="j j-q">?</span></div>
+        <div class="mrow"><span class="nm">untyped</span><span class="vn na">n/a</span><span class="na">—</span></div>
+        <div class="mrow"><span class="nm">strict</span><span class="vn">on</span><span class="rung md">md</span><span class="j j-q">?</span></div>
+        <div class="sect"><span>Bundle Size</span><span class="verdict" style="color:var(--warn)">2/2 md ?</span></div>
+        <div class="mrow"><span class="nm">total</span><span class="vn down">30%↓</span><span class="rung md">md</span><span class="j j-q">?</span></div>
+        <div class="mrow"><span class="nm">initial</span><span class="vn down">84%↓</span><span class="rung md">md</span><span class="j j-q">?</span></div>
+      </div>
+    </div>
+  </section>
+</main>
+</body>
+</html>

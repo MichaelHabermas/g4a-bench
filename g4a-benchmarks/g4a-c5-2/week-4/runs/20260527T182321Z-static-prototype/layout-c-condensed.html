@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Condensed comparison — who did best</title>
+<style>
+  :root{
+    --ink:#191919;--muted:#6b655d;--paper:#f5f1e9;--panel:#fffdf8;--line:#d6cdbf;
+    --good:#1c6b54;--good-bg:#e6f3ec;--bad:#9c2f25;--bad-bg:#f8e1de;
+    --grey:#7c756b;--grey-bg:#ece7dd;--blue:#274f7f;--warn:#9a5a10;--warn-bg:#fdf0d8;
+    --gold:#9a7a16;--gold-bg:#fbf3d6;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.4;overflow:visible}
+  main{max-width:980px;margin:0 auto;padding:26px 20px 90px}
+  h1{font-size:30px;margin:0 0 4px}
+  .lead{color:var(--muted);max-width:760px;margin:0 0 18px;font-size:14px}
+
+  /* overall banner */
+  .overall{display:flex;align-items:center;gap:12px;background:var(--gold-bg);border:1px solid var(--gold);
+    padding:12px 16px;margin-bottom:18px}
+  .overall .lbl{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted)}
+  .overall .who{font-size:22px;font-weight:850;color:var(--gold)}
+  .overall .prov{font-size:12px;color:var(--muted)}
+
+  table{width:100%;border-collapse:collapse}
+  thead th{text-align:left;padding:8px 10px;font-size:13px}
+  thead .repohead{text-align:center;font-weight:850;font-size:16px;border-bottom:2px solid var(--ink);width:24%}
+  thead .metrichead{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.06em;width:28%}
+
+  tr.catrow td{background:#ece4d7;border-top:1px solid var(--line);padding:8px 10px}
+  .catname{font-weight:850;font-size:13px;text-transform:uppercase;letter-spacing:.05em}
+  .catbest{float:right;font-weight:800;font-size:12px;color:var(--gold)}
+
+  tbody td{border-bottom:1px solid var(--line);padding:7px 10px;vertical-align:middle}
+  .mlabel{color:var(--muted);font-size:13px}
+  .cell{text-align:center;width:24%}
+  .num{font-weight:800;font-size:15px}
+  .down{color:var(--good)}.flat{color:var(--bad)}.na{color:var(--grey);font-weight:600}
+  .rung{display:inline-block;font-size:9px;font-weight:700;padding:0 5px;border-radius:8px;border:1px solid currentColor;vertical-align:middle}
+  .art{color:var(--blue);background:#e4ecf6}.md{color:var(--warn);background:var(--warn-bg)}
+  .j{display:inline-block;font-size:10px;font-weight:800;vertical-align:middle}
+  .j-ok{color:var(--good)}.j-q{color:var(--warn)}.j-x{color:var(--bad)}
+  .best{background:var(--gold-bg);box-shadow:inset 3px 0 0 var(--gold)}
+  .star{color:var(--gold)}
+
+  /* tucked-away hover */
+  .tip{position:relative;cursor:help}
+  .tip::before{content:"ⓘ";font-size:11px;color:var(--muted);margin-left:5px;font-weight:700}
+  .tip:hover::after{content:attr(data-tip);position:absolute;right:0;top:130%;white-space:pre-line;
+    width:300px;background:#1d1b16;color:#f4efe6;padding:10px 12px;font-size:12px;line-height:1.4;
+    border-radius:5px;z-index:30;font-weight:500;box-shadow:0 6px 20px rgba(0,0,0,.3);text-transform:none;letter-spacing:0;text-align:left}
+  .legend{font-size:12px;color:var(--muted);margin-top:18px}
+</style>
+</head>
+<body>
+<main>
+  <h1>Week 4 — who did best</h1>
+  <p class="lead">Labels once on the left, repos across the top: scan a row to see who won that metric (★),
+  scan a category band to see who won the category. "Best" is <strong>trust-weighted</strong>, not highest number —
+  hover any <span style="color:var(--muted)">ⓘ</span> for the measure and the pros.</p>
+
+  <div class="overall">
+    <span class="lbl">Overall lead</span>
+    <span class="who">michael 🏆</span>
+    <span class="prov tip" data-tip="BEST BY: count of categories led on artifact-backed, broad, passing evidence.&#10;&#10;PROS&#10;• Leads Type Safety: cut all three violation types incl. the hard `as` bucket, on artifact rung.&#10;• Passes Bundle initial-load (73.9%↓) on artifacts.&#10;&#10;CAVEAT&#10;• Provisional — nothing reproduced from a clean clone yet.&#10;• Shiv reports higher raw numbers but on reported-math only.">provisional</span>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th class="metrichead">metric</th>
+        <th class="repohead">michael</th>
+        <th class="repohead">dalton</th>
+        <th class="repohead">shiv</th>
+      </tr>
+    </thead>
+    <tbody>
+
+      <!-- TYPE SAFETY -->
+      <tr class="catrow"><td colspan="4">
+        <span class="catname">Type Safety</span>
+        <span class="catbest tip" data-tip="BEST BY: largest artifact-backed, broad-based violation reduction (production any+as+! on AST counting).&#10;&#10;PROS — michael&#10;• 923→409 (55.7%↓), all three types down incl. `as` casts (−26%), the bucket dalton left untouched.&#10;• Production baseline (923) matches dalton's (925) → the comparison is valid.&#10;&#10;WHY NOT shiv&#10;• Reports 1219→0 (100%) but reported-math only, different instrument (ESLint+tests), single-pass — high superficiality risk.">🏆 michael</span>
+      </td></tr>
+
+      <tr>
+        <td class="mlabel">total (any+as+!)</td>
+        <td class="cell best"><span class="star">★</span> <span class="num down">55.7%↓</span> <span class="rung art">art</span> <span class="j j-q">?</span></td>
+        <td class="cell"><span class="num down">33.4%↓</span> <span class="rung art">art</span> <span class="j j-q">?</span></td>
+        <td class="cell"><span class="num down">100%↓</span> <span class="rung md">md</span> <span class="j j-q">?</span></td>
+      </tr>
+      <tr>
+        <td class="mlabel">explicit <code>any</code></td>
+        <td class="cell best"><span class="star">★</span> <span class="num down">98.9%↓</span> <span class="rung art">art</span> <span class="j j-ok">✓</span></td>
+        <td class="cell"><span class="num down">31.3%↓</span> <span class="rung art">art</span> <span class="j j-q">?</span></td>
+        <td class="cell"><span class="num down">100%↓</span> <span class="rung md">md</span> <span class="j j-q">?</span></td>
+      </tr>
+      <tr>
+        <td class="mlabel"><code>as</code> casts</td>
+        <td class="cell best"><span class="star">★</span> <span class="num down">26.2%↓</span> <span class="rung art">art</span> <span class="j j-ok">✓</span></td>
+        <td class="cell"><span class="num flat">0% flat</span> <span class="rung art">art</span> <span class="j j-x">✗</span></td>
+        <td class="cell"><span class="num down">100%↓</span> <span class="rung md">md</span> <span class="j j-q">?</span></td>
+      </tr>
+      <tr>
+        <td class="mlabel">non-null <code>!</code></td>
+        <td class="cell best"><span class="star">★</span> <span class="num down">88.9%↓</span> <span class="rung art">art</span> <span class="j j-q">?</span></td>
+        <td class="cell"><span class="num down">85.8%↓</span> <span class="rung art">art</span> <span class="j j-q">?</span></td>
+        <td class="cell"><span class="num down">100%↓</span> <span class="rung md">md</span> <span class="j j-q">?</span></td>
+      </tr>
+      <tr>
+        <td class="mlabel">untyped params</td>
+        <td class="cell na">—</td>
+        <td class="cell"><span class="num flat">0% flat</span> <span class="rung art">art</span> <span class="j j-x">✗</span></td>
+        <td class="cell na">n/a</td>
+      </tr>
+      <tr>
+        <td class="mlabel">strict mode</td>
+        <td class="cell"><span class="num">on</span> <span class="rung art">art</span></td>
+        <td class="cell"><span class="num">on</span> <span class="rung art">art</span></td>
+        <td class="cell"><span class="num">on</span> <span class="rung md">md</span></td>
+      </tr>
+
+      <!-- BUNDLE SIZE -->
+      <tr class="catrow"><td colspan="4">
+        <span class="catname">Bundle Size</span>
+        <span class="catbest tip" data-tip="BEST BY: highest artifact-backed initial-load reduction (code-splitting path).&#10;&#10;PROS — dalton&#10;• Initial JS 2050→286 KB (86%↓), before/after JSON pair committed.&#10;&#10;CAVEAT&#10;• Total bundle still up (−0.7%); not reproduced.&#10;• Shiv reports total-bundle pass (30%↓) too, but reported-math only.">🏆 dalton</span>
+      </td></tr>
+
+      <tr>
+        <td class="mlabel">total bundle</td>
+        <td class="cell"><span class="num flat">-4.7%</span> <span class="rung art">art</span> <span class="j j-x">✗</span></td>
+        <td class="cell"><span class="num flat">-0.7%</span> <span class="rung art">art</span> <span class="j j-x">✗</span></td>
+        <td class="cell best"><span class="star">★</span> <span class="num down">30%↓</span> <span class="rung md">md</span> <span class="j j-q">?</span></td>
+      </tr>
+      <tr>
+        <td class="mlabel">initial load</td>
+        <td class="cell"><span class="num down">73.9%↓</span> <span class="rung art">art</span> <span class="j j-ok">✓</span></td>
+        <td class="cell best"><span class="star">★</span> <span class="num down">86%↓</span> <span class="rung art">art</span> <span class="j j-ok">✓</span></td>
+        <td class="cell"><span class="num down">84%↓</span> <span class="rung md">md</span> <span class="j j-q">?</span></td>
+      </tr>
+
+    </tbody>
+  </table>
+
+  <p class="legend">
+    ★ best in row (trust-weighted) &nbsp;·&nbsp; 🏆 best in category &nbsp;·&nbsp;
+    rung: <span class="rung art">art</span> artifact-backed, <span class="rung md">md</span> reported-math &nbsp;·&nbsp;
+    judgment: <span class="j j-ok">✓</span> meaningful, <span class="j j-q">?</span> needs judgment, <span class="j j-x">✗</span> superficial/contested &nbsp;·&nbsp;
+    hover <span style="color:var(--muted)">ⓘ</span> for "best by what measure" + pros
+  </p>
+</main>
+</body>
+</html>

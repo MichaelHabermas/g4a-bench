@@ -39,6 +39,13 @@ import uuid
 from pathlib import Path
 from typing import Any
 
+# Load g4a-harness/.env so the system carries its own key (no shell export needed).
+try:
+    from dotenv import load_dotenv
+    load_dotenv(Path(__file__).parent / ".env")
+except ImportError:
+    pass
+
 MODEL = "claude-opus-4-8"
 MAX_STEPS = 40
 MAX_TOOL_OUTPUT = 12000  # chars of bash output fed back per call
@@ -74,10 +81,17 @@ Disciplines (do not violate):
   Record the commands.
 - HELD LOOSELY. Your method is a strong default, not a codified rule. Record a \
   revisit condition: what would make a better method.
-- "COULDN'T MEASURE" IS A VALID RESULT. If the build fails or the metric isn't \
-  reproducible, report that honestly with the evidence.
+- IT IS OK TO SAY "I DON'T KNOW." Push as far as you reasonably can — try another \
+  approach before giving up — but NEVER invent a number. If you cannot fully \
+  verify, give your best estimate, say exactly what it rests on, and set your \
+  confidence honestly. A low-confidence honest estimate is worth more than a \
+  confident guess. Three dispositions:
+    * "measured"        — you ran the tool and trust the number.
+    * "partial_estimate"— your best read, not fully verified (say why, set low/medium).
+    * "could_not_measure"— blocked; report the blocker and the evidence.
+  Always report `confidence` and `what_would_raise_confidence`.
 
-When you have measured the criterion (or determined you cannot), you MUST call \
+When you are done (measured, estimated, or blocked), you MUST call \
 `submit_measurement` exactly once with your structured result. Do not finish by \
 writing prose alone — the run only completes when you call that tool.\
 """
@@ -106,21 +120,23 @@ SUBMIT_TOOL = {
     "input_schema": {
         "type": "object",
         "properties": {
-            "status": {"type": "string", "enum": ["measured", "could_not_measure"]},
+            "status": {"type": "string", "enum": ["measured", "partial_estimate", "could_not_measure"]},
             "method": {"type": "string", "description": "The instrument/approach you chose."},
             "method_rationale": {"type": "string", "description": "Why this method, for this repo."},
             "verified_values": {
                 "type": "object",
-                "description": "The numbers you measured, as key/value (e.g. {\"as_casts\": 628}). Empty if could_not_measure.",
+                "description": "The numbers, as key/value (e.g. {\"as_casts\": 628}). For partial_estimate, your best-estimate numbers. Empty if could_not_measure.",
                 "additionalProperties": True,
             },
-            "self_report_comparison": {"type": "string", "description": "How your measurement compares to the team's claim; flag divergence."},
+            "self_report_comparison": {"type": "string", "description": "How your result compares to the team's claim; flag divergence."},
             "qualitative_judgment": {"type": "string", "description": "Any spec-named qualitative gate you assessed, labeled as judgment."},
             "confidence": {"type": "string", "enum": ["high", "medium", "low"]},
+            "blockers": {"type": "string", "description": "What stopped full verification (build failure, missing env, ambiguity). Empty if none."},
+            "what_would_raise_confidence": {"type": "string", "description": "What you'd need to move this to a confident, verified measurement."},
             "held_loosely": {"type": "string", "description": "What would make a better method next time."},
             "commands_summary": {"type": "string", "description": "The key commands you ran to produce the numbers."},
         },
-        "required": ["status", "method", "method_rationale", "verified_values", "confidence"],
+        "required": ["status", "method", "method_rationale", "verified_values", "confidence", "what_would_raise_confidence"],
     },
 }
 

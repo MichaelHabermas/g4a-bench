@@ -67,3 +67,13 @@ Append-only. Newest at bottom.
 **Why:** Week 4 showed **untyped params** on the scorecard with no harness measurement for two teams and an unverified 0% artifact for a third — dev chat should surface that honestly and search repos for counting scripts.
 
 **Revisit when:** TS agent can run targeted measurements on demand; dev-only code access may fold into a scoped "investigate metric" job.
+
+---
+
+## 2026-05-29 — Clone-all-teams + untyped params instrument
+
+**Decision:** `POST /api/runs/.../clones` (and `pnpm yardstick:clone`) clone REPOS.md into `{YARDSTICK_CLONE_ROOT}/{cohort}/week-{n}/{runId}/{team}`, pinned to `commit_sha` from trace when present. Type-safety verification uses `g4a-harness/ts_violation_counter.cjs` for `any`/`as`/`!` (AST) and `untyped_params` (TypeScript diagnostics with syntactic fallback when program creation fails).
+
+**Week 4 dogfood (20260527T182321Z-static-prototype):** After sync with legacy prototype clones, verified untyped remaining counts were ~1513 / ~1577 / ~1434 (syntactic_fallback — diagnostics program did not resolve deps without `pnpm install`). Dalton's self-reported 1371 untyped is within 15% of harness 1577 (not flagged). Two teams had no self-reported untyped; harness now shows verified numbers instead of blank cells.
+
+**Revisit when:** Run `clone` with `--install` for full diagnostic counts; compare syntactic vs diagnostic and tighten flag thresholds if needed.

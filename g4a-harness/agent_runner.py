@@ -297,7 +297,7 @@ def build_user_message(
             f"\n## Harness tools (read-only)\n"
             f"Cohort instruments are mounted at `{HARNESS_CONTAINER_PATH}/`. "
             f"Example AST counter:\n"
-            f"`node {HARNESS_CONTAINER_PATH}/ts_violation_counter.js /repo api/src,web/src,shared/src`\n"
+            f"`node {HARNESS_CONTAINER_PATH}/ts_violation_counter.cjs /repo api/src,web/src,shared/src`\n"
         )
     return "".join(parts)
 

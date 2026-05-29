@@ -90,6 +90,33 @@ export function resolveBaseline(cohort: string, week: number) {
   return api(`/api/baseline/${cohort}/${week}/resolve`, { method: 'POST' });
 }
 
+export interface CloneManifestEntry {
+  team: string;
+  url: string;
+  sha: string | null;
+  path: string;
+  status: string;
+  error?: string;
+}
+
+export interface CloneManifest {
+  cloned_at: string;
+  entries: CloneManifestEntry[];
+  clone_base: string;
+}
+
+export function cloneRunTeams(cohort: string, week: number, runId: string, install = false) {
+  return api(`/api/runs/${cohort}/${week}/${runId}/clones`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ install }),
+  });
+}
+
+export function fetchCloneManifest(cohort: string, week: number, runId: string): Promise<{ manifest: CloneManifest | null }> {
+  return api(`/api/runs/${cohort}/${week}/${runId}/clones`);
+}
+
 export function shortTeam(handle: string): string {
   return handle.split('-').slice(-1)[0] ?? handle;
 }

@@ -1,7 +1,8 @@
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
-import { basename, join } from 'node:path';
+import { join } from 'node:path';
 import { spawnSync } from 'node:child_process';
-import { cloneRoot, findRepoRoot } from '../paths.js';
+import { findRepoRoot } from '../paths.js';
+import { resolveTeamClonePath as resolveTeamClonePathFromClones } from '../clones/index.js';
 import { readJsonIfExists } from '../fs.js';
 import type { ScorecardModel } from '../scorecard/index.js';
 
@@ -43,12 +44,10 @@ export function resolveTeamClonePath(
   team: string,
   root = findRepoRoot(),
 ): string | null {
-  const legacy = join('/private/tmp/g4a-bench-prototype', cohort, `week-${week}`, runId, team);
-  const local = join(cloneRoot(root), cohort, `week-${week}`, runId, team);
-  if (existsSync(legacy)) return legacy;
-  if (existsSync(local)) return local;
-  return null;
+  return resolveTeamClonePathFromClones(cohort, week, runId, team, root);
 }
+
+// re-export not duplicated at package root — use clones module
 
 export function extractCoverageGaps(
   typesafetyTrace: Record<string, unknown> | null,
@@ -76,7 +75,9 @@ export function extractCoverageGaps(
         const judgment = part.judgment as string | undefined;
 
         if (metricId === 'untyped') {
-          if (value == null && before == null && after == null) {
+          if (part.verified) {
+            /* harness measured — no coverage gap */
+          } else if (value == null && before == null && after == null) {
             gaps.push({
               category: 'Type Safety',
               metric_id: metricId,
@@ -84,7 +85,7 @@ export function extractCoverageGaps(
               team: teamId,
               issue: judgment === 'not_claimed' ? 'not_claimed' : 'missing',
               detail:
-                'No untyped-params count in trace. Harness AST counter (any/as/!) does not measure untyped parameters — only team artifacts would.',
+                'No untyped-params count in trace and harness has not verified yet. Run clone + sync to measure via TypeScript diagnostics.',
               trace_excerpt: part,
             });
           } else if (!verified && before != null && after != null && reduction === 0) {

@@ -4,7 +4,7 @@
   "records": [
     {
       "team": "github-com-michaelhabermas-ship-shape",
-      "metric_class": "type-safety syntactic counts (any/as/!)",
+      "metric_class": "type-safety syntactic counts (any/as/!) + untyped params (diagnostics)",
       "considered_methods": [
         {
           "method": "regex grep",
@@ -17,19 +17,73 @@
           "why": "Self-reported, and `consistent-type-assertions` flags only a narrow subset of `as` usages — not the spec's 'type assertions (as)'."
         },
         {
-          "method": "typescript compiler AST",
+          "method": "typescript compiler AST + diagnostics",
           "verdict": "chosen",
-          "why": "Authoritative for cast/non-null/any nodes, identical definition across all repos, and safe: it only parses, never executes the clone."
+          "why": "Authoritative for cast/non-null/any nodes and implicit-any diagnostics (untyped params), consistent across repos, and safe because it only parses/typechecks — never executes the clone."
         }
       ],
-      "chosen_method": "typescript compiler AST",
-      "held_loosely": "Count is syntactic — cannot judge whether a remaining cast is justified or a removed `any` was genuinely narrowed. Revisit with a type-aware (full-program) pass or a diff-based superficiality method.",
-      "status": "clone_unavailable",
-      "note": "No clone at /private/tmp/g4a-bench-prototype/g4a-c5-2/week-4/20260527T182321Z-static-prototype/20260527T182321Z-static-prototype/github-com-michaelhabermas-ship-shape; cannot verify, self-report stands but remains unverified."
+      "chosen_method": "typescript compiler AST + diagnostics",
+      "held_loosely": "Count is syntactic/diagnostic — cannot judge whether a remaining cast is justified or a removed `any` was genuinely narrowed. Revisit with a type-aware pass or diff-based superficiality method.",
+      "status": "verified",
+      "tool": {
+        "name": "typescript-ast",
+        "ts_version": "5.9.3",
+        "scope": [
+          "api/src",
+          "web/src",
+          "shared/src"
+        ],
+        "files": 408,
+        "untyped_method": "syntactic_fallback",
+        "diagnostic_codes": []
+      },
+      "verified_remaining": {
+        "any": 12,
+        "as": 284,
+        "nonnull": 37,
+        "untyped": 1513,
+        "total": 333
+      },
+      "checks": {
+        "any": {
+          "verified": 12,
+          "claimed_after": 1,
+          "flagged": false,
+          "discrepancy": 11,
+          "note": "self-report roughly consistent with verified count"
+        },
+        "as": {
+          "verified": 284,
+          "claimed_after": 372,
+          "flagged": true,
+          "discrepancy": -88,
+          "note": "self-report rejected — verified count diverges materially"
+        },
+        "nonnull": {
+          "verified": 37,
+          "claimed_after": 36,
+          "flagged": false,
+          "discrepancy": 1,
+          "note": "self-report roughly consistent with verified count"
+        },
+        "total": {
+          "verified": 333,
+          "claimed_after": 409,
+          "flagged": true,
+          "discrepancy": -76,
+          "note": "self-report rejected — verified count diverges materially"
+        },
+        "untyped": {
+          "verified": 1513,
+          "flagged": false,
+          "discrepancy": null,
+          "note": "no self-reported after to compare"
+        }
+      }
     },
     {
       "team": "labs-gauntletai-com-daltondinderman-shipshape",
-      "metric_class": "type-safety syntactic counts (any/as/!)",
+      "metric_class": "type-safety syntactic counts (any/as/!) + untyped params (diagnostics)",
       "considered_methods": [
         {
           "method": "regex grep",
@@ -42,19 +96,74 @@
           "why": "Self-reported, and `consistent-type-assertions` flags only a narrow subset of `as` usages — not the spec's 'type assertions (as)'."
         },
         {
-          "method": "typescript compiler AST",
+          "method": "typescript compiler AST + diagnostics",
           "verdict": "chosen",
-          "why": "Authoritative for cast/non-null/any nodes, identical definition across all repos, and safe: it only parses, never executes the clone."
+          "why": "Authoritative for cast/non-null/any nodes and implicit-any diagnostics (untyped params), consistent across repos, and safe because it only parses/typechecks — never executes the clone."
         }
       ],
-      "chosen_method": "typescript compiler AST",
-      "held_loosely": "Count is syntactic — cannot judge whether a remaining cast is justified or a removed `any` was genuinely narrowed. Revisit with a type-aware (full-program) pass or a diff-based superficiality method.",
-      "status": "clone_unavailable",
-      "note": "No clone at /private/tmp/g4a-bench-prototype/g4a-c5-2/week-4/20260527T182321Z-static-prototype/20260527T182321Z-static-prototype/labs-gauntletai-com-daltondinderman-shipshape; cannot verify, self-report stands but remains unverified."
+      "chosen_method": "typescript compiler AST + diagnostics",
+      "held_loosely": "Count is syntactic/diagnostic — cannot judge whether a remaining cast is justified or a removed `any` was genuinely narrowed. Revisit with a type-aware pass or diff-based superficiality method.",
+      "status": "verified",
+      "tool": {
+        "name": "typescript-ast",
+        "ts_version": "5.9.3",
+        "scope": [
+          "api/src",
+          "web/src",
+          "shared/src"
+        ],
+        "files": 287,
+        "untyped_method": "syntactic_fallback",
+        "diagnostic_codes": []
+      },
+      "verified_remaining": {
+        "any": 66,
+        "as": 451,
+        "nonnull": 47,
+        "untyped": 1577,
+        "total": 564
+      },
+      "checks": {
+        "any": {
+          "verified": 66,
+          "claimed_after": 66,
+          "flagged": false,
+          "discrepancy": 0,
+          "note": "self-report roughly consistent with verified count"
+        },
+        "as": {
+          "verified": 451,
+          "claimed_after": 504,
+          "flagged": false,
+          "discrepancy": -53,
+          "note": "self-report roughly consistent with verified count"
+        },
+        "nonnull": {
+          "verified": 47,
+          "claimed_after": 46,
+          "flagged": false,
+          "discrepancy": 1,
+          "note": "self-report roughly consistent with verified count"
+        },
+        "total": {
+          "verified": 564,
+          "claimed_after": 616,
+          "flagged": false,
+          "discrepancy": -52,
+          "note": "self-report roughly consistent with verified count"
+        },
+        "untyped": {
+          "verified": 1577,
+          "claimed_after": 1371,
+          "flagged": false,
+          "discrepancy": 206,
+          "note": "self-report roughly consistent with verified count"
+        }
+      }
     },
     {
       "team": "labs-gauntletai-com-shivkanthalu-ship",
-      "metric_class": "type-safety syntactic counts (any/as/!)",
+      "metric_class": "type-safety syntactic counts (any/as/!) + untyped params (diagnostics)",
       "considered_methods": [
         {
           "method": "regex grep",
@@ -67,15 +176,69 @@
           "why": "Self-reported, and `consistent-type-assertions` flags only a narrow subset of `as` usages — not the spec's 'type assertions (as)'."
         },
         {
-          "method": "typescript compiler AST",
+          "method": "typescript compiler AST + diagnostics",
           "verdict": "chosen",
-          "why": "Authoritative for cast/non-null/any nodes, identical definition across all repos, and safe: it only parses, never executes the clone."
+          "why": "Authoritative for cast/non-null/any nodes and implicit-any diagnostics (untyped params), consistent across repos, and safe because it only parses/typechecks — never executes the clone."
         }
       ],
-      "chosen_method": "typescript compiler AST",
-      "held_loosely": "Count is syntactic — cannot judge whether a remaining cast is justified or a removed `any` was genuinely narrowed. Revisit with a type-aware (full-program) pass or a diff-based superficiality method.",
-      "status": "clone_unavailable",
-      "note": "No clone at /private/tmp/g4a-bench-prototype/g4a-c5-2/week-4/20260527T182321Z-static-prototype/20260527T182321Z-static-prototype/labs-gauntletai-com-shivkanthalu-ship; cannot verify, self-report stands but remains unverified."
+      "chosen_method": "typescript compiler AST + diagnostics",
+      "held_loosely": "Count is syntactic/diagnostic — cannot judge whether a remaining cast is justified or a removed `any` was genuinely narrowed. Revisit with a type-aware pass or diff-based superficiality method.",
+      "status": "verified",
+      "tool": {
+        "name": "typescript-ast",
+        "ts_version": "5.9.3",
+        "scope": [
+          "api/src",
+          "web/src",
+          "shared/src"
+        ],
+        "files": 293,
+        "untyped_method": "syntactic_fallback",
+        "diagnostic_codes": []
+      },
+      "verified_remaining": {
+        "any": 0,
+        "as": 628,
+        "nonnull": 1,
+        "untyped": 1437,
+        "total": 629
+      },
+      "checks": {
+        "any": {
+          "verified": 0,
+          "claimed_after": 0,
+          "flagged": false,
+          "discrepancy": 0,
+          "note": "self-report roughly consistent with verified count"
+        },
+        "as": {
+          "verified": 628,
+          "claimed_after": 0,
+          "flagged": true,
+          "discrepancy": 628,
+          "note": "self-report rejected — verified count diverges materially"
+        },
+        "nonnull": {
+          "verified": 1,
+          "claimed_after": 0,
+          "flagged": false,
+          "discrepancy": 1,
+          "note": "self-report roughly consistent with verified count"
+        },
+        "total": {
+          "verified": 629,
+          "claimed_after": 0,
+          "flagged": true,
+          "discrepancy": 629,
+          "note": "self-report rejected — verified count diverges materially"
+        },
+        "untyped": {
+          "verified": 1437,
+          "flagged": false,
+          "discrepancy": null,
+          "note": "no self-reported after to compare"
+        }
+      }
     }
   ]
 }

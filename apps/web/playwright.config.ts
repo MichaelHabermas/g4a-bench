@@ -6,19 +6,19 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: 0,
   use: {
-    baseURL: 'http://localhost:5173',
+    baseURL: 'http://localhost:5184',
     trace: 'on-first-retry',
   },
   projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
   webServer: [
     {
       command: 'pnpm --filter @yardstick/server dev',
-      port: 8787,
+      port: 5183,
       reuseExistingServer: !process.env.CI,
     },
     {
       command: 'pnpm --filter @yardstick/web dev',
-      port: 5173,
+      port: 5184,
       reuseExistingServer: !process.env.CI,
     },
   ],

@@ -34,6 +34,9 @@ import {
   loadBaselineConfig,
   cloneUpstreamBaseline,
   harnessDir,
+  cloneAllForRun,
+  loadCloneManifest,
+  buildClonePlan,
 } from '@yardstick/core';
 import { spawn } from 'node:child_process';
 import { existsSync } from 'node:fs';
@@ -294,4 +297,23 @@ export function resolveBaseline(cohort: string, week: number) {
     firstCommitSha: sha,
   });
   return { configured: true as const, baselineId: id, sha, path: dest };
+}
+
+export function cloneRunTeams(
+  cohort: string,
+  week: number,
+  runId: string,
+  options: { install?: boolean } = {},
+) {
+  const runRow = getRun(db, cohort, week, runId);
+  const runPath = runRow?.artifact_path ?? join(root, 'g4a-benchmarks', cohort, `week-${week}`, 'runs', runId);
+  const plan = buildClonePlan(runPath, cohort, week, runId, root);
+  const manifest = cloneAllForRun(runPath, cohort, week, runId, options, root);
+  return { plan: { warnings: plan.warnings, entries: plan.entries.map((e) => ({ team: e.team, url: e.url, sha: e.commitSha })) }, manifest };
+}
+
+export function getCloneManifestForRun(cohort: string, week: number, runId: string) {
+  const runRow = getRun(db, cohort, week, runId);
+  const runPath = runRow?.artifact_path ?? join(root, 'g4a-benchmarks', cohort, `week-${week}`, 'runs', runId);
+  return loadCloneManifest(runPath);
 }

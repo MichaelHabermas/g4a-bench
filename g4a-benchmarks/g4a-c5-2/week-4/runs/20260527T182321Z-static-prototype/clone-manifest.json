@@ -1,0 +1,30 @@
+{
+  "cloned_at": "2026-05-29T16:11:39.230Z",
+  "cohort": "g4a-c5-2",
+  "week": 4,
+  "runId": "20260527T182321Z-static-prototype",
+  "clone_base": "/Users/michaelhabermas/repos/GAI/g4a-bench/.yardstick/clones/g4a-c5-2/week-4/20260527T182321Z-static-prototype",
+  "entries": [
+    {
+      "team": "github-com-michaelhabermas-ship-shape",
+      "url": "https://github.com/MichaelHabermas/ship-shape",
+      "sha": "e5fed89d6c053094fbcc53d8c301dc3f98c330a2",
+      "path": "/Users/michaelhabermas/repos/GAI/g4a-bench/.yardstick/clones/g4a-c5-2/week-4/20260527T182321Z-static-prototype/github-com-michaelhabermas-ship-shape",
+      "status": "skipped_existing"
+    },
+    {
+      "team": "labs-gauntletai-com-daltondinderman-shipshape",
+      "url": "https://labs.gauntletai.com/daltondinderman/shipshape",
+      "sha": null,
+      "path": "/Users/michaelhabermas/repos/GAI/g4a-bench/.yardstick/clones/g4a-c5-2/week-4/20260527T182321Z-static-prototype/labs-gauntletai-com-daltondinderman-shipshape",
+      "status": "skipped_existing"
+    },
+    {
+      "team": "labs-gauntletai-com-shivkanthalu-ship",
+      "url": "https://labs.gauntletai.com/shivkanthalu/ship",
+      "sha": null,
+      "path": "/Users/michaelhabermas/repos/GAI/g4a-bench/.yardstick/clones/g4a-c5-2/week-4/20260527T182321Z-static-prototype/labs-gauntletai-com-shivkanthalu-ship",
+      "status": "skipped_existing"
+    }
+  ]
+}

@@ -40,15 +40,18 @@ ROOT = Path("/Users/michaelhabermas/repos/GAI/g4a-bench")
 HARNESS = ROOT / "g4a-harness"
 RUNS_DIR = ROOT / "g4a-benchmarks/g4a-c5-2/week-4/runs"
 CLONE_BASE = Path("/private/tmp/g4a-bench-prototype/g4a-c5-2/week-4")
+YARDSTICK_CLONES = ROOT / ".yardstick" / "clones" / "g4a-c5-2" / "week-4"
 TS_LIB = Path("/tmp/tsverify/node_modules/typescript")
+
+VERIFY_PARTS = ("any", "as", "nonnull", "total", "untyped")
 
 CONSIDERED_METHODS = [
     {"method": "regex grep", "verdict": "rejected",
      "why": "Counts `import { X as Y }` aliases as casts. Measured here: crude `as` ~956 vs real 284 for one repo — unusable for the `as` metric."},
     {"method": "team's ESLint output", "verdict": "rejected",
      "why": "Self-reported, and `consistent-type-assertions` flags only a narrow subset of `as` usages — not the spec's 'type assertions (as)'."},
-    {"method": "typescript compiler AST", "verdict": "chosen",
-     "why": "Authoritative for cast/non-null/any nodes, identical definition across all repos, and safe: it only parses, never executes the clone."},
+    {"method": "typescript compiler AST + diagnostics", "verdict": "chosen",
+     "why": "Authoritative for cast/non-null/any nodes and implicit-any diagnostics (untyped params), consistent across repos, and safe because it only parses/typechecks."},
 ]
 HELD_LOOSELY = (
     "Count is syntactic — cannot judge whether a remaining cast is justified or a "
@@ -69,7 +72,7 @@ def ensure_typescript() -> None:
 def run_counter(repo: Path) -> dict[str, Any]:
     env = dict(os.environ, TS_LIB=str(TS_LIB))
     out = subprocess.run(
-        ["node", str(HARNESS / "ts_violation_counter.js"), str(repo)],
+        ["node", str(HARNESS / "ts_violation_counter.cjs"), str(repo)],
         capture_output=True, text=True, env=env, check=True,
     )
     return json.loads(out.stdout.strip())
@@ -91,20 +94,34 @@ def latest_run() -> Path:
     return candidates[-1]
 
 
+def resolve_clone_base(run_dir: Path) -> Path | None:
+    """Run-level directory containing team clone subfolders."""
+    run_name = run_dir.name
+    yardstick = YARDSTICK_CLONES / run_name
+    if yardstick.is_dir():
+        return yardstick
+    legacy = CLONE_BASE / run_name
+    if legacy.is_dir():
+        return legacy
+    return None
+
+
 def verify(run_dir: Path) -> dict[str, Any]:
     ensure_typescript()
     trace_path = run_dir / "typesafety-trace.json"
     trace = json.loads(trace_path.read_text(encoding="utf-8"))
-    clone_root = CLONE_BASE / run_dir.name
+    clone_root = resolve_clone_base(run_dir)
+    if clone_root is None:
+        raise SystemExit(f"No clone directory for run {run_dir.name} — clone teams first.")
 
     records = []
     for team in trace["teams"]:
         repo = clone_root / team["team"]
         rec: dict[str, Any] = {
             "team": team["team"],
-            "metric_class": "type-safety syntactic counts (any/as/!)",
+            "metric_class": "type-safety syntactic counts (any/as/!) + untyped params (diagnostics)",
             "considered_methods": CONSIDERED_METHODS,
-            "chosen_method": "typescript compiler AST",
+            "chosen_method": "typescript compiler AST + diagnostics",
             "held_loosely": HELD_LOOSELY,
         }
         if not repo.exists():
@@ -115,29 +132,42 @@ def verify(run_dir: Path) -> dict[str, Any]:
 
         result = run_counter(repo)
         counts = result["counts"]
-        verified = {"any": counts["any"], "as": counts["as"], "nonnull": counts["nonnull"]}
+        untyped_method = result.get("untyped_method", "unknown")
+        verified = {
+            "any": counts["any"],
+            "as": counts["as"],
+            "nonnull": counts["nonnull"],
+            "untyped": counts.get("untyped_params", 0),
+        }
         verified["total"] = verified["any"] + verified["as"] + verified["nonnull"]
         rec["status"] = "verified"
-        rec["tool"] = {"name": result["tool"], "ts_version": result["ts_version"],
-                       "scope": result["scope"], "files": result["files"]}
+        rec["tool"] = {
+            "name": result["tool"],
+            "ts_version": result["ts_version"],
+            "scope": result["scope"],
+            "files": result["files"],
+            "untyped_method": untyped_method,
+            "diagnostic_codes": result.get("diagnostic_codes"),
+        }
         rec["verified_remaining"] = verified
         rec["checks"] = {}
 
-        # Enrich the trace: each measured part gets a verified remaining-count,
-        # a comparison to the claim, and its trust rung lifts to "verified".
-        for pid in ("any", "as", "nonnull", "total"):
+        for pid in VERIFY_PARTS:
             part = team["parts"].get(pid)
             if not part:
                 continue
             claimed_after = part.get("after")
-            chk = flag(verified[pid], claimed_after)
-            rec["checks"][pid] = {"verified": verified[pid], "claimed_after": claimed_after, **chk}
+            verified_count = verified.get(pid)
+            if verified_count is None:
+                continue
+            chk = flag(verified_count, claimed_after)
+            rec["checks"][pid] = {"verified": verified_count, "claimed_after": claimed_after, **chk}
             part["verified"] = {
-                "remaining": verified[pid],
+                "remaining": verified_count,
                 "claimed_after": claimed_after,
                 "discrepancy": chk["discrepancy"],
                 "flagged": chk["flagged"],
-                "method": "typescript-ast",
+                "method": "typescript-diagnostics" if pid == "untyped" else "typescript-ast",
             }
             part["trust"] = "verified"
         team["verification"] = rec
@@ -166,7 +196,7 @@ def main() -> int:
             continue
         v = rec["verified_remaining"]
         flags = [pid for pid, c in rec["checks"].items() if c["flagged"]]
-        print(f"  {rec['team']}: verified remaining any={v['any']} as={v['as']} !={v['nonnull']} total={v['total']}"
+        print(f"  {rec['team']}: verified remaining any={v['any']} as={v['as']} !={v['nonnull']} untyped={v.get('untyped', '?')} total={v['total']}"
               + (f"  ⚠ self-report rejected on: {', '.join(flags)}" if flags else ""))
     print(f"\nWrote {run_dir/'verification.json'} and enriched typesafety-trace.json")
     return 0

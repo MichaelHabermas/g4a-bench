@@ -1,6 +1,6 @@
 import { spawnSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
-import { basename, join } from 'node:path';
+import { join } from 'node:path';
 import { readJson, writeJson } from '../fs.js';
 import { harnessDir } from '../paths.js';
 
@@ -16,14 +16,16 @@ const CONSIDERED_METHODS = [
     why: "Self-reported, and `consistent-type-assertions` flags only a narrow subset of `as` usages — not the spec's 'type assertions (as)'.",
   },
   {
-    method: 'typescript compiler AST',
+    method: 'typescript compiler AST + diagnostics',
     verdict: 'chosen',
-    why: 'Authoritative for cast/non-null/any nodes, identical definition across all repos, and safe: it only parses, never executes the clone.',
+    why: 'Authoritative for cast/non-null/any nodes and implicit-any diagnostics (untyped params), consistent across repos, and safe because it only parses/typechecks — never executes the clone.',
   },
 ];
 
 const HELD_LOOSELY =
-  'Count is syntactic — cannot judge whether a remaining cast is justified or a removed `any` was genuinely narrowed. Revisit with a type-aware (full-program) pass or a diff-based superficiality method.';
+  'Count is syntactic/diagnostic — cannot judge whether a remaining cast is justified or a removed `any` was genuinely narrowed. Revisit with a type-aware pass or diff-based superficiality method.';
+
+const VERIFY_PARTS = ['any', 'as', 'nonnull', 'total', 'untyped'] as const;
 
 function flag(verified: number, claimed: number | null | undefined): {
   flagged: boolean;
@@ -44,31 +46,49 @@ function flag(verified: number, claimed: number | null | undefined): {
   };
 }
 
+export function ensureTypescriptLib(root?: string): void {
+  const tsLib =
+    process.env.TS_LIB ?? join('/tmp/tsverify/node_modules/typescript');
+  if (existsSync(join(tsLib, 'package.json')) || existsSync(join(tsLib, 'lib', 'typescript.js'))) {
+    return;
+  }
+  const parent = join('/tmp/tsverify');
+  if (!existsSync(parent)) {
+    spawnSync('mkdir', ['-p', parent], { encoding: 'utf8' });
+  }
+  spawnSync('npm', ['i', 'typescript@5.9.3', '--no-save', '--silent'], {
+    cwd: parent,
+    encoding: 'utf8',
+  });
+  void root;
+}
+
 export function runTsCounter(repoPath: string, root?: string): Record<string, unknown> {
+  ensureTypescriptLib(root);
   const harness = harnessDir(root);
-  const script = join(harness, 'ts_violation_counter.js');
+  const script = join(harness, 'ts_violation_counter.cjs');
   const env = { ...process.env, TS_LIB: process.env.TS_LIB ?? '/tmp/tsverify/node_modules/typescript' };
-  const out = spawnSync('node', [script, repoPath], { encoding: 'utf8', env });
+  const out = spawnSync('node', [script, repoPath], { encoding: 'utf8', env, maxBuffer: 16 * 1024 * 1024 });
   if (out.status !== 0) {
     throw new Error(out.stderr || out.stdout || 'ts_violation_counter failed');
   }
   return JSON.parse(out.stdout.trim()) as Record<string, unknown>;
 }
 
-export function verifyTypesafety(runDir: string, cloneRoot: string): boolean {
+/** cloneBase is the run-level directory containing team subfolders. */
+export function verifyTypesafety(runDir: string, cloneBase: string): boolean {
   const tracePath = join(runDir, 'typesafety-trace.json');
   if (!existsSync(tracePath)) return false;
   const trace = readJson<Record<string, any>>(tracePath);
-  const cloneBase = join(cloneRoot, basename(runDir));
   const records: Record<string, unknown>[] = [];
 
   for (const team of trace.teams ?? []) {
     const repo = join(cloneBase, team.team as string);
     const rec: Record<string, unknown> = {
       team: team.team,
-      metric_class: 'type-safety syntactic counts (any/as/!)',
+      metric_class: 'type-safety syntactic counts (any/as/!) + untyped params (diagnostics)',
       considered_methods: CONSIDERED_METHODS,
-      chosen_method: 'typescript compiler AST',
+      chosen_method: 'typescript compiler AST + diagnostics',
       held_loosely: HELD_LOOSELY,
     };
     if (!existsSync(repo)) {
@@ -80,39 +100,45 @@ export function verifyTypesafety(runDir: string, cloneRoot: string): boolean {
 
     const result = runTsCounter(repo);
     const counts = result.counts as Record<string, number>;
-    const verified: Record<'any' | 'as' | 'nonnull' | 'total', number> = {
+    const untypedMethod = result.untyped_method as string | undefined;
+    const verified: Record<string, number> = {
       any: counts.any ?? 0,
       as: counts.as ?? 0,
       nonnull: counts.nonnull ?? 0,
+      untyped: counts.untyped_params ?? 0,
       total: 0,
     };
-    verified.total = verified.any + verified.as + verified.nonnull;
+    verified.total = (verified.any ?? 0) + (verified.as ?? 0) + (verified.nonnull ?? 0);
     rec.status = 'verified';
     rec.tool = {
       name: result.tool,
       ts_version: result.ts_version,
       scope: result.scope,
       files: result.files,
+      untyped_method: untypedMethod ?? 'unknown',
+      diagnostic_codes: result.diagnostic_codes,
     };
     rec.verified_remaining = verified;
     rec.checks = {};
 
-    for (const pid of ['any', 'as', 'nonnull', 'total'] as const) {
+    for (const pid of VERIFY_PARTS) {
       const part = team.parts?.[pid];
       if (!part) continue;
       const claimedAfter = part.after as number | undefined;
-      const chk = flag(verified[pid], claimedAfter);
+      const verifiedCount = verified[pid];
+      if (verifiedCount == null) continue;
+      const chk = flag(verifiedCount, claimedAfter);
       (rec.checks as Record<string, unknown>)[pid] = {
-        verified: verified[pid],
+        verified: verifiedCount,
         claimed_after: claimedAfter,
         ...chk,
       };
       part.verified = {
-        remaining: verified[pid],
+        remaining: verifiedCount,
         claimed_after: claimedAfter,
         discrepancy: chk.discrepancy,
         flagged: chk.flagged,
-        method: 'typescript-ast',
+        method: pid === 'untyped' ? (untypedMethod ?? 'typescript-diagnostics') : 'typescript-ast',
       };
       part.trust = 'verified';
     }

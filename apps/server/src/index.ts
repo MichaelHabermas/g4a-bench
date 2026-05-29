@@ -21,6 +21,8 @@ import {
   resolveBaseline,
   loadYardstickStore,
   getChatConfig,
+  cloneRunTeams,
+  getCloneManifestForRun,
 } from './services.js';
 import { root } from './env.js';
 
@@ -83,6 +85,23 @@ app.get('/api/runs/:cohort/:week/:runId/yardsticks', (c) => {
   return c.json(loadYardstickStore(path));
 });
 
+app.post('/api/runs/:cohort/:week/:runId/clones', async (c) => {
+  const { cohort, week, runId } = c.req.param();
+  const body = await c.req.json<{ install?: boolean }>().catch(() => ({ install: undefined }));
+  try {
+    return c.json(cloneRunTeams(cohort, Number(week), runId, { install: body.install === true }));
+  } catch (e) {
+    return c.json({ error: String(e) }, 500);
+  }
+});
+
+app.get('/api/runs/:cohort/:week/:runId/clones', (c) => {
+  const { cohort, week, runId } = c.req.param();
+  const manifest = getCloneManifestForRun(cohort, Number(week), runId);
+  if (!manifest) return c.json({ manifest: null });
+  return c.json({ manifest });
+});
+
 app.post('/api/runs/:cohort/:week/:runId/jobs', async (c) => {
   const { cohort, week, runId } = c.req.param();
   const body = await c.req.json<{ criterionId: string; team: string; repoPath?: string }>();
@@ -136,6 +155,6 @@ app.post('/api/baseline/:cohort/:week/resolve', (c) => {
 
 registerAllRuns();
 
-const port = Number(process.env.PORT ?? 8787);
+const port = Number(process.env.PORT ?? 5183);
 console.log(`Yardstick server on http://localhost:${port}`);
 serve({ fetch: app.fetch, port });

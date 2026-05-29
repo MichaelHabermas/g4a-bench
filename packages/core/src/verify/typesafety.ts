@@ -3,6 +3,7 @@ import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { readJson, writeJson } from '../fs.js';
 import { harnessDir } from '../paths.js';
+import { logDecision } from '../decisions/index.js';
 
 const CONSIDERED_METHODS = [
   {
@@ -95,8 +96,28 @@ export function verifyTypesafety(runDir: string, cloneBase: string): boolean {
       rec.status = 'clone_unavailable';
       rec.note = `No clone at ${repo}; cannot verify, self-report stands but remains unverified.`;
       records.push(rec);
+      logDecision(runDir, {
+        phase: 'verify',
+        subject: { team: team.team as string, criterion: 'type-safety' },
+        decision: 'skipped — clone unavailable',
+        why: rec.note as string,
+        evidence: ['typesafety-trace.json'],
+        confidence: 'low',
+      });
       continue;
     }
+
+    logDecision(runDir, {
+      phase: 'verify',
+      subject: { team: team.team as string, criterion: 'type-safety' },
+      decision: `instrument: typescript compiler AST + diagnostics`,
+      chosen: 'typescript compiler AST + diagnostics',
+      rejected: CONSIDERED_METHODS.filter((m) => m.verdict === 'rejected').map((m) => m.method),
+      why: CONSIDERED_METHODS.find((m) => m.verdict === 'chosen')!.why,
+      evidence: ['verification.json', 'g4a-harness/ts_violation_counter.cjs'],
+      held_loosely: HELD_LOOSELY,
+      confidence: 'high',
+    });
 
     const result = runTsCounter(repo);
     const counts = result.counts as Record<string, number>;
@@ -141,6 +162,17 @@ export function verifyTypesafety(runDir: string, cloneBase: string): boolean {
         method: pid === 'untyped' ? (untypedMethod ?? 'typescript-diagnostics') : 'typescript-ast',
       };
       part.trust = 'verified';
+
+      logDecision(runDir, {
+        phase: 'verify',
+        subject: { team: team.team as string, criterion: 'type-safety', metric: pid },
+        decision: `verified_remaining: ${verifiedCount}${claimedAfter != null ? ` (claimed ${claimedAfter})` : ''}`,
+        chosen: pid === 'untyped' ? (untypedMethod ?? 'typescript-diagnostics') : 'typescript-ast',
+        why: chk.note,
+        evidence: [`typesafety-trace.json#teams.${team.team}.parts.${pid}`, 'verification.json'],
+        confidence: chk.flagged ? 'medium' : 'high',
+        flagged: chk.flagged,
+      });
     }
     team.verification = rec;
     records.push(rec);

@@ -3,6 +3,7 @@ import { join } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { cloneRoot, findRepoRoot, challengerReposDir } from '../paths.js';
 import { readJsonIfExists, writeJson } from '../fs.js';
+import { logDecision } from '../decisions/index.js';
 
 export interface RepoSpec {
   team: string;
@@ -291,6 +292,29 @@ export function cloneTeamRepos(
   };
 
   writeJson(join(plan.runDir, 'clone-manifest.json'), manifest);
+
+  for (const e of entries) {
+    logDecision(plan.runDir, {
+      phase: 'clone',
+      subject: { team: e.team },
+      decision: `clone ${e.status}${e.sha ? ` @ ${e.sha.slice(0, 7)}` : ''}`,
+      chosen: e.path,
+      why: e.error ?? `Repository cloned to ${e.path}`,
+      evidence: ['clone-manifest.json'],
+      confidence: e.status === 'cloned' || e.status === 'skipped_existing' ? 'high' : 'low',
+      flagged: e.status === 'failed' || e.status === 'checkout_failed',
+    });
+  }
+
+  logDecision(plan.runDir, {
+    phase: 'clone',
+    subject: {},
+    decision: `clone batch: ${entries.filter((e) => e.status === 'cloned' || e.status === 'skipped_existing').length}/${entries.length} teams ready`,
+    why: `Clone base: ${plan.cloneBase}`,
+    evidence: ['clone-manifest.json'],
+    confidence: 'high',
+  });
+
   return manifest;
 }
 

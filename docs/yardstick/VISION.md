@@ -18,6 +18,16 @@ Yardstick is the measurement platform for G4A weekly challenger benchmarks. It r
 - A chatbot that reads cloned repo source in production (chat uses run artifacts and DB index only). In **dev mode** (`YARDSTICK_DEV_MODE=true`), chat may include clone snippets and ripgrep hits to explain coverage gaps.
 - A hosted multi-tenant product (v1 is local-only).
 
+## One UI entry point
+
+- **Yardstick** at `/` lists runs; opening a run lands on **Overview** with a persistent sidebar (Scorecard, Compare, **Decision Trail**, Workbench, Run plan).
+- Deep links are normal routes under the same shell — not separate apps or orphan HTML files.
+
+## Decision Trail
+
+- Append-only `decision-log.jsonl` per run records clone, verify, sync, agent, yardstick, and orchestrator choices (why, evidence, confidence).
+- **Decision Trail** in the run sidebar is the human-readable view; dev chat can focus on a specific `decision_id`.
+
 ## Adversarial stance
 
 - Verification beats self-report.

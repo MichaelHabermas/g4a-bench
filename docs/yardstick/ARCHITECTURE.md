@@ -5,8 +5,8 @@
 ## Monorepo layout
 
 ```text
-apps/web/          Vite + React + Tailwind v4 — dashboards + context chat
-apps/server/       Hono API — sync, runs, jobs, chat SSE
+apps/web/          Vite + React + Tailwind v4 — Yardstick UI (single entry: run picker + run shell)
+apps/server/       Hono API — sync, runs, jobs, chat, decisions, run plan
 packages/core/     Schemas, sync, yardstick, baseline, scorecard model
 packages/db/       SQLite migrations + queries
 packages/llm/      Provider-agnostic LLM (Anthropic first, OpenAI stub)
@@ -54,6 +54,7 @@ flowchart TB
 | 6 | Floating context chat |
 | 7 | Job queue + Python agent bridge |
 | 8 | Baseline first-commit + yardstick auto-promote UI |
+| 9 | Decision Trail (`decision-log.jsonl`) + unified run shell + Week 4 orchestrator plan |
 
 ## Pivot triggers
 

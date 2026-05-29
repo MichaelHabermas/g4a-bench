@@ -65,6 +65,12 @@ export function ChatFab() {
 
   function askAboutFocus() {
     if (!focus) return;
+    if (focus.decision_id) {
+      setInput(
+        `Explain decision ${focus.decision_id} ("${focus.label}"). What evidence did we use, what alternatives were rejected, and should we trust this step?`,
+      );
+      return;
+    }
     setInput(
       `How did we get the "${focus.label}" numbers? Why are some teams blank or showing 0%? Can you find evidence in the repos for how untyped params should be measured?`,
     );

@@ -23,6 +23,11 @@ import {
   getChatConfig,
   cloneRunTeams,
   getCloneManifestForRun,
+  getDecisionsForRun,
+  getRunPlanForRun,
+  dryRunRunPlan,
+  executeRunPlan,
+  getBenchmarkCatalog,
 } from './services.js';
 import { root } from './env.js';
 
@@ -30,6 +35,8 @@ const app = new Hono();
 app.use('/*', cors());
 
 app.get('/api/health', (c) => c.json({ ok: true, tracer: process.env.TRACE_PROVIDER ?? 'auto' }));
+
+app.get('/api/catalog', (c) => c.json(getBenchmarkCatalog()));
 
 app.get('/api/runs', (c) => {
   registerAllRuns();
@@ -100,6 +107,44 @@ app.get('/api/runs/:cohort/:week/:runId/clones', (c) => {
   const manifest = getCloneManifestForRun(cohort, Number(week), runId);
   if (!manifest) return c.json({ manifest: null });
   return c.json({ manifest });
+});
+
+app.get('/api/runs/:cohort/:week/:runId/decisions', (c) => {
+  const { cohort, week, runId } = c.req.param();
+  const phase = c.req.query('phase');
+  const team = c.req.query('team');
+  const limit = c.req.query('limit') ? Number(c.req.query('limit')) : undefined;
+  return c.json(
+    getDecisionsForRun(cohort, Number(week), runId, {
+      phase: phase || undefined,
+      team: team || undefined,
+      limit,
+    }),
+  );
+});
+
+app.get('/api/runs/:cohort/:week/:runId/plan', (c) => {
+  const { cohort, week, runId } = c.req.param();
+  return c.json(getRunPlanForRun(cohort, Number(week), runId));
+});
+
+app.post('/api/runs/:cohort/:week/:runId/plan/dry-run', (c) => {
+  const { cohort, week, runId } = c.req.param();
+  try {
+    return c.json(dryRunRunPlan(cohort, Number(week), runId));
+  } catch (e) {
+    return c.json({ error: String(e) }, 500);
+  }
+});
+
+app.post('/api/runs/:cohort/:week/:runId/plan/execute', async (c) => {
+  const { cohort, week, runId } = c.req.param();
+  const body = (await c.req.json<{ install?: boolean }>().catch(() => ({}))) as { install?: boolean };
+  try {
+    return c.json(executeRunPlan(cohort, Number(week), runId, { install: body.install === true }));
+  } catch (e) {
+    return c.json({ error: String(e) }, 500);
+  }
 });
 
 app.post('/api/runs/:cohort/:week/:runId/jobs', async (c) => {

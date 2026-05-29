@@ -37,6 +37,15 @@ import {
   cloneAllForRun,
   loadCloneManifest,
   buildClonePlan,
+  readDecisionLog,
+  filterDecisions,
+  buildWeek4RunPlan,
+  saveRunPlan,
+  resolveTeamClonePath,
+  logDecision,
+  type RunPlan,
+  type DecisionPhase,
+  listBenchmarkCatalog,
 } from '@yardstick/core';
 import { spawn } from 'node:child_process';
 import { existsSync } from 'node:fs';
@@ -166,6 +175,29 @@ export async function runPythonAgent(job: Record<string, unknown>): Promise<void
         tryAutoPromote(runPath, {
           criterionId: latest.criterion_id,
           measurement: latest,
+        });
+        const m = latest as Record<string, unknown>;
+        logDecision(runPath, {
+          phase: 'agent',
+          subject: {
+            team: job.team as string,
+            criterion: String(m.criterion_id ?? criterionId),
+            job_id: jobId,
+          },
+          decision: `Agent measurement complete for ${m.criterion_id ?? criterionId}`,
+          chosen: typeof m.method === 'string' ? m.method : typeof m.instrument === 'string' ? m.instrument : undefined,
+          why: String(m.summary ?? m.verdict ?? 'See agent-measurements artifact'),
+          evidence: [`agent-measurements/${artifact}`],
+          confidence: m.verified ? 'high' : 'medium',
+        });
+      } else {
+        logDecision(runPath, {
+          phase: 'agent',
+          subject: { team: job.team as string, criterion: criterionId, job_id: jobId },
+          decision: `Agent job finished (${criterionId})`,
+          why: `Artifact ${artifact} written; sync triggered`,
+          evidence: [`agent-measurements/${artifact}`],
+          confidence: 'medium',
         });
       }
       syncRun(job.cohort as string, job.week as number, job.run_id as string);
@@ -316,4 +348,125 @@ export function getCloneManifestForRun(cohort: string, week: number, runId: stri
   const runRow = getRun(db, cohort, week, runId);
   const runPath = runRow?.artifact_path ?? join(root, 'g4a-benchmarks', cohort, `week-${week}`, 'runs', runId);
   return loadCloneManifest(runPath);
+}
+
+export function getBenchmarkCatalog() {
+  return listBenchmarkCatalog(root);
+}
+
+function runPathFor(cohort: string, week: number, runId: string): string {
+  const runRow = getRun(db, cohort, week, runId);
+  return runRow?.artifact_path ?? join(root, 'g4a-benchmarks', cohort, `week-${week}`, 'runs', runId);
+}
+
+export function getDecisionsForRun(
+  cohort: string,
+  week: number,
+  runId: string,
+  filter: { phase?: string; team?: string; limit?: number } = {},
+) {
+  const runPath = runPathFor(cohort, week, runId);
+  const entries = filterDecisions(readDecisionLog(runPath), {
+    phase: filter.phase as DecisionPhase | undefined,
+    team: filter.team,
+    limit: filter.limit,
+  });
+  return { entries, total: readDecisionLog(runPath).length };
+}
+
+export function getRunPlanForRun(cohort: string, week: number, runId: string) {
+  const runPath = runPathFor(cohort, week, runId);
+  const existing = readJsonIfExists<RunPlan>(join(runPath, 'run-plan.json'));
+  if (existing) return { plan: existing };
+  const plan = buildWeek4RunPlan(runPath, cohort, week, runId, { dryRun: true });
+  return { plan };
+}
+
+export function dryRunRunPlan(cohort: string, week: number, runId: string) {
+  const runPath = runPathFor(cohort, week, runId);
+  const plan = buildWeek4RunPlan(runPath, cohort, week, runId, { dryRun: true });
+  saveRunPlan(runPath, plan);
+  return { plan };
+}
+
+export function executeRunPlan(
+  cohort: string,
+  week: number,
+  runId: string,
+  options: { install?: boolean } = {},
+) {
+  const runRow = getRun(db, cohort, week, runId);
+  if (!runRow) throw new Error('Run not found');
+  const runPath = runRow.artifact_path;
+
+  cloneAllForRun(runPath, cohort, week, runId, { install: options.install === true }, root);
+
+  const syncPayload = syncRun(cohort, week, runId);
+
+  const plan = buildWeek4RunPlan(runPath, cohort, week, runId, { dryRun: false });
+  let queued = 0;
+  const missingClones: string[] = [];
+
+  for (const step of plan.steps) {
+    if (step.phase === 'clone' || step.phase === 'verify') {
+      step.status = 'done';
+      continue;
+    }
+    if (step.phase === 'baseline') {
+      try {
+        resolveBaseline(cohort, week);
+        step.status = 'done';
+      } catch {
+        step.status = 'pending';
+        step.note = 'Baseline config missing or clone failed';
+      }
+      continue;
+    }
+    if (step.phase !== 'agent' || !step.team) continue;
+
+    const repoPath = resolveTeamClonePath(cohort, week, runId, step.team, root);
+    if (!repoPath) {
+      missingClones.push(step.team);
+      step.status = 'skipped';
+      step.note = 'Clone path not found';
+      continue;
+    }
+    queueJob({
+      runRowId: runRow.id,
+      criterionId: step.criterion_id,
+      team: step.team,
+      repoPath,
+    });
+    step.status = 'pending';
+    step.note = 'Job queued';
+    queued += 1;
+  }
+
+  plan.steps.filter((s) => s.id === 'sync-final').forEach((s) => {
+    s.status = 'pending';
+    s.note = 'Runs after agent jobs complete';
+  });
+
+  saveRunPlan(runPath, plan);
+  logDecision(runPath, {
+    phase: 'orchestrator',
+    subject: {},
+    decision: `Execute plan: cloned teams, synced, queued ${queued} agent jobs`,
+    why: [
+      `measurements: ${syncPayload.measurementCount}`,
+      `typesafety_verify: ${syncPayload.typesafety_verify}`,
+      missingClones.length ? `missing clones: ${missingClones.join(', ')}` : 'all clone paths resolved for agent steps',
+    ].join('; '),
+    evidence: ['run-plan.json', 'clone-manifest.json'],
+    confidence: missingClones.length ? 'medium' : 'high',
+    flagged: missingClones.length > 0,
+  });
+
+  setImmediate(() => processPendingJobs());
+
+  return {
+    plan,
+    queued,
+    message: `Cloned and synced. Queued ${queued} agent jobs${missingClones.length ? ` (${missingClones.length} skipped — no clone)` : ''}.`,
+  };
 }

@@ -2,6 +2,7 @@ import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { readJson, writeJson } from '../fs.js';
 import type { AgentMeasurement } from '../schemas/index.js';
+import { logDecision } from '../decisions/index.js';
 
 export interface YardstickStore {
   version: number;
@@ -79,6 +80,17 @@ export function tryAutoPromote(runDir: string, input: PromoteInput): boolean {
   }
 
   saveYardstickStore(runDir, store);
+
+  logDecision(runDir, {
+    phase: 'yardstick',
+    subject: { criterion: input.criterionId },
+    decision: existing ? `yardstick superseded for ${input.criterionId}` : `yardstick established for ${input.criterionId}`,
+    chosen: result.method ?? 'agent measurement',
+    why: input.rationale ?? result.method_rationale ?? 'Auto-promoted after successful challenge with high confidence.',
+    evidence: [`agent-measurements/${artifact}`, 'yardsticks.json'],
+    confidence: 'high',
+  });
+
   return true;
 }
 

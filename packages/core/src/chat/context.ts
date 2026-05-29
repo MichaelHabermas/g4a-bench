@@ -4,6 +4,13 @@ import { spawnSync } from 'node:child_process';
 import { findRepoRoot } from '../paths.js';
 import { resolveTeamClonePath as resolveTeamClonePathFromClones } from '../clones/index.js';
 import { readJsonIfExists } from '../fs.js';
+import {
+  readDecisionLog,
+  filterDecisions,
+  buildDecisionDigest,
+  getDecisionById,
+  decisionSummaryByPhase,
+} from '../decisions/index.js';
 import type { ScorecardModel } from '../scorecard/index.js';
 
 export interface CoverageGap {
@@ -319,6 +326,24 @@ export function buildEnrichedChatContext(input: {
 
   const spec_excerpt = input.typesafetyTrace?.spec_excerpt ?? null;
 
+  const allDecisions = readDecisionLog(input.runDir);
+  const focusDecisionId =
+    input.uiContext?.focus && typeof input.uiContext.focus === 'object'
+      ? (input.uiContext.focus as { decision_id?: string }).decision_id
+      : undefined;
+  const focusDecision = focusDecisionId ? getDecisionById(input.runDir, focusDecisionId) : null;
+  const decision_trail = {
+    total: allDecisions.length,
+    by_phase: decisionSummaryByPhase(allDecisions),
+    focus: focusDecision,
+    recent_digest: buildDecisionDigest(
+      filterDecisions(allDecisions, {
+        team: focus?.team,
+        limit: 50,
+      }),
+    ),
+  };
+
   return {
     run: { cohort: input.cohort, week: input.week, runId: input.runId, path: input.runDir },
     run_state: input.runState,
@@ -330,6 +355,7 @@ export function buildEnrichedChatContext(input: {
     spec_excerpt,
     coverage_gaps,
     dev_code,
+    decision_trail,
     ui: input.uiContext ?? {},
     chat_mode: isDevChatMode() ? 'dev_with_code' : 'artifacts_only',
   };

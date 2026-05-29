@@ -478,6 +478,29 @@ def main() -> int:
         fh.write(json.dumps(ledger_entry) + "\n")
 
     try:
+        from log_decision import log_decision
+
+        team_slug = args.repo.name
+        log_decision(
+            args.run_dir,
+            {
+                "phase": "agent",
+                "subject": {
+                    "team": team_slug,
+                    "criterion": args.criterion_id,
+                },
+                "decision": f"Agent measured {args.criterion_id or 'criterion'} on {team_slug}",
+                "chosen": result.get("method") or result.get("instrument"),
+                "why": str(result.get("summary") or result.get("verdict") or result.get("explanation") or "See artifact"),
+                "evidence": [str(out_path.relative_to(args.run_dir))],
+                "confidence": "high" if result.get("verified") else "medium",
+                "held_loosely": result.get("held_loosely"),
+            },
+        )
+    except Exception as exc:
+        print(f"warn: could not log decision: {exc}", file=sys.stderr)
+
+    try:
         from sync_run import refresh_html
         refreshed = refresh_html(args.run_dir)
         for html_path in refreshed:

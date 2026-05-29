@@ -3,6 +3,7 @@ export interface ChatFocus {
   team?: string;
   label: string;
   category?: string;
+  decision_id?: string;
 }
 
 let currentFocus: ChatFocus | null = null;

@@ -7,6 +7,7 @@ import { resolveExistingRunCloneDir } from '../clones/index.js';
 import { loadScorecardModel } from '../scorecard/index.js';
 import type { RunState } from '../schemas/index.js';
 import { readJsonIfExists } from '../fs.js';
+import { logDecision } from '../decisions/index.js';
 
 export interface IndexRunInput {
   runDir: string;
@@ -61,6 +62,21 @@ export function syncAndIndexRun(input: IndexRunInput): RunIndexPayload {
     typesafety_judgment: syncResult.typesafety_judgment,
     typesafety_verify: syncResult.typesafety_verify,
   };
+
+  logDecision(input.runDir, {
+    phase: 'sync',
+    subject: {},
+    decision: `sync complete — ${payload.measurementCount} measurements, ${payload.scorecardTeamCount} teams`,
+    why: [
+      `bundle_trace: ${syncResult.bundle_trace}`,
+      `typesafety_judgment: ${syncResult.typesafety_judgment}`,
+      `typesafety_verify: ${syncResult.typesafety_verify}`,
+      cloneBase ? `clones: ${cloneBase}` : 'no clone dir — verify skipped',
+    ].join('; '),
+    evidence: ['run-state.json', 'typesafety-trace.json', 'bundle-trace.json'],
+    confidence: 'high',
+  });
+
   input.indexFn?.(payload);
   return payload;
 }

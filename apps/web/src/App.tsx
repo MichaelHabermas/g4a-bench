@@ -1,34 +1,35 @@
-import { Link, Route, Routes } from 'react-router-dom';
-import { RunPickerPage } from './pages/RunPickerPage';
+import { Navigate, Route, Routes } from 'react-router-dom';
+import { AppShell } from './layout/AppShell';
+import { HomePage } from './pages/HomePage';
+import { WeekHubPage } from './pages/WeekHubPage';
 import { RunLayout } from './pages/RunLayout';
+import { RunOverviewPage } from './pages/RunOverviewPage';
 import { ScorecardPage } from './pages/ScorecardPage';
 import { ComparePage } from './pages/ComparePage';
 import { WorkbenchPage } from './pages/WorkbenchPage';
+import { DecisionTrailPage } from './pages/DecisionTrailPage';
+import { RunPlanPage } from './pages/RunPlanPage';
 import { ChatFab } from './components/ChatFab';
 
 export default function App() {
   return (
-    <div className="min-h-screen">
-      <header className="border-b border-stone-200 bg-white px-6 py-4">
-        <div className="mx-auto flex max-w-6xl items-center justify-between">
-          <Link to="/" className="text-xl font-bold tracking-tight text-stone-900">
-            Yardstick
-          </Link>
-          <p className="text-sm text-stone-500">Adversarial G4A measurement</p>
-        </div>
-      </header>
-      <main className="mx-auto max-w-6xl px-6 py-8">
-        <Routes>
-          <Route path="/" element={<RunPickerPage />} />
+    <>
+      <Routes>
+        <Route element={<AppShell />}>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/cohorts/:cohort/week/:week" element={<WeekHubPage />} />
           <Route path="/run/:cohort/:week/:runId" element={<RunLayout />}>
-            <Route index element={<ScorecardPage />} />
+            <Route index element={<Navigate to="overview" replace />} />
+            <Route path="overview" element={<RunOverviewPage />} />
             <Route path="scorecard" element={<ScorecardPage />} />
             <Route path="compare" element={<ComparePage />} />
+            <Route path="decisions" element={<DecisionTrailPage />} />
             <Route path="workbench" element={<WorkbenchPage />} />
+            <Route path="plan" element={<RunPlanPage />} />
           </Route>
-        </Routes>
-      </main>
+        </Route>
+      </Routes>
       <ChatFab />
-    </div>
+    </>
   );
 }

@@ -20,3 +20,6 @@ export {
   loadCloneManifest,
 } from './clones/index.js';
 export type { CloneManifest, ClonePlan, RepoSpec } from './clones/index.js';
+export * from './decisions/index.js';
+export * from './orchestrator/index.js';
+export * from './catalog/index.js';

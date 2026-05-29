@@ -47,6 +47,7 @@ from pathlib import Path
 from typing import Any
 
 _HARNESS_DIR = Path(__file__).resolve().parent
+HARNESS_CONTAINER_PATH = "/harness"
 if str(_HARNESS_DIR) not in sys.path:
     sys.path.insert(0, str(_HARNESS_DIR))
 
@@ -204,8 +205,9 @@ SUBMIT_TOOL = {
 class DockerSandbox:
     """Persistent container over the clone. bash calls run via `docker exec`."""
 
-    def __init__(self, repo: Path, image: str = "node:24-bookworm"):
-        self.repo = repo
+    def __init__(self, repo: Path, harness_dir: Path | None = None, image: str = "node:24-bookworm"):
+        self.repo = repo.resolve()
+        self.harness_dir = (harness_dir or _HARNESS_DIR).resolve()
         self.image = image
         self.name = f"g4a-agent-{uuid.uuid4().hex[:10]}"
 
@@ -213,6 +215,7 @@ class DockerSandbox:
         subprocess.run(
             ["docker", "run", "-d", "--rm", "--name", self.name,
              "-v", f"{self.repo}:/repo", "-w", "/repo",
+             "-v", f"{self.harness_dir}:{HARNESS_CONTAINER_PATH}:ro",
              "--memory", "4g", "--cpus", "2",
              self.image, "sleep", "infinity"],
             check=True, capture_output=True,
@@ -273,6 +276,7 @@ def build_user_message(
     self_report: str | None,
     criterion_id: str | None,
     run_dir: Path | None,
+    sandbox_kind: str = "docker",
 ) -> str:
     parts = [
         "## Criterion to measure\n", criterion.strip(), "\n\n",
@@ -287,6 +291,13 @@ def build_user_message(
         parts.append(
             "\nInspect the repo, choose your method, measure, then call submit_measurement "
             "with run_mode=establish.\n"
+        )
+    if sandbox_kind == "docker":
+        parts.append(
+            f"\n## Harness tools (read-only)\n"
+            f"Cohort instruments are mounted at `{HARNESS_CONTAINER_PATH}/`. "
+            f"Example AST counter:\n"
+            f"`node {HARNESS_CONTAINER_PATH}/ts_violation_counter.js /repo api/src,web/src,shared/src`\n"
         )
     return "".join(parts)
 
@@ -317,7 +328,9 @@ def run_agent(
     client = anthropic.Anthropic()  # reads ANTHROPIC_API_KEY
     sandbox = DockerSandbox(repo) if sandbox_kind == "docker" else LocalSandbox(repo)
     transcript: list[dict[str, Any]] = []
-    base = assemble_request(build_user_message(criterion, repo, self_report, criterion_id, run_dir))
+    base = assemble_request(
+        build_user_message(criterion, repo, self_report, criterion_id, run_dir, sandbox_kind)
+    )
     messages = base["messages"]
     result: dict[str, Any] | None = None
 
@@ -410,7 +423,7 @@ def main() -> int:
 
     if args.dry_run:
         req = assemble_request(
-            build_user_message(criterion, args.repo, args.self_report, args.criterion_id, args.run_dir)
+            build_user_message(criterion, args.repo, args.self_report, args.criterion_id, args.run_dir, args.sandbox)
         )
         preview = {
             "model": req["model"], "thinking": req["thinking"], "output_config": req["output_config"],
@@ -418,6 +431,7 @@ def main() -> int:
             "tools": [t["name"] for t in req["tools"]],
             "first_user_message": req["messages"][0]["content"],
             "sandbox": args.sandbox, "repo_exists": args.repo.exists(),
+            "harness_mount": HARNESS_CONTAINER_PATH if args.sandbox == "docker" else None,
             "criterion_id": args.criterion_id,
             "yardstick_exists": bool(
                 args.criterion_id and load_yardstick(args.run_dir, args.criterion_id)
@@ -462,6 +476,15 @@ def main() -> int:
     }
     with (args.run_dir / "ledger.jsonl").open("a", encoding="utf-8") as fh:
         fh.write(json.dumps(ledger_entry) + "\n")
+
+    try:
+        from sync_run import refresh_html
+        refreshed = refresh_html(args.run_dir)
+        for html_path in refreshed:
+            print(f"refreshed {html_path}", file=sys.stderr)
+    except Exception as exc:
+        print(f"warn: could not refresh HTML views: {exc}", file=sys.stderr)
+
     print(out_path)
     return 0
 

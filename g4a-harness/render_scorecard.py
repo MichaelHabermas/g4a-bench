@@ -98,8 +98,35 @@ def bundle_criterion(trace: dict[str, Any]) -> dict[str, Any]:
         states = {s["name"]: s["value"] for s in team.get("evidence_states") or []}
         comparability = states.get("comparability")
         cells = {}
+        team_verified = False
         for path in team["target_paths"]:
             outcome = "passes" if str(path["state"]).startswith("passes_") else "fails"
+            v = path.get("verified")
+            if v and v.get("after_kb") is not None:
+                after_kb = float(v["after_kb"])
+                trust = "verified"
+                team_verified = True
+                judgment = "meaningful" if outcome == "passes" else "needs_review"
+                if v.get("flagged"):
+                    judgment = "needs_review"
+                cells[path["id"]] = {
+                    "kind": "reduction",
+                    "value_kind": "verified_after",
+                    "reduction_percent": path.get("reduction_percent"),
+                    "remaining": None,
+                    "claimed_after": path.get("after_kb"),
+                    "before": path.get("before_kb", path.get("before")),
+                    "after": after_kb,
+                    "unit": "KB",
+                    "trust": trust,
+                    "outcome": outcome,
+                    "judgment": judgment,
+                    "flagged": v.get("flagged", False),
+                    "verified": True,
+                    "goodness": -after_kb,
+                    "display": f"{after_kb:.0f} KiB ver",
+                }
+                continue
             trust = "artifact-backed" if "artifact_math" in path["state"] else "reported-math" if "markdown_math" in path["state"] else "claimed"
             if outcome == "fails":
                 judgment = "not_addressed"
@@ -111,9 +138,13 @@ def bundle_criterion(trace: dict[str, Any]) -> dict[str, Any]:
                 "reduction_pct", reduction_percent=path.get("reduction_percent"),
                 before=path.get("before_kb", path.get("before")), after=path.get("after_kb", path.get("after")),
                 unit="KB", trust=trust, outcome=outcome, judgment=judgment, verified=False)
-        teams[team["team"]] = {"cells": cells, "info": team_info(team)}
+        teams[team["team"]] = {"cells": cells, "info": team_info(team), "_verified": team_verified}
+    any_verified = any(t.get("_verified") for t in teams.values())
+    for t in teams.values():
+        t.pop("_verified", None)
     return {"id": "bundle-size", "name": "Bundle Size", "unit": "KB", "combine": "any_threshold",
-            "headline": None, "threshold_percent": None, "parts": parts, "teams": teams, "verified_kind": False}
+            "headline": None, "threshold_percent": None, "parts": parts, "teams": teams,
+            "verified_kind": any_verified}
 
 
 def typesafety_criterion(trace: dict[str, Any]) -> dict[str, Any]:

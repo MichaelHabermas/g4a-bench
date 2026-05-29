@@ -74,19 +74,19 @@
       <h2>Measurement Readiness</h2>
       <table>
         <thead><tr><th>Team</th><th>Readiness</th><th>Target Path</th><th>Evidence Shape</th><th>Current Judgment</th></tr></thead>
-        <tbody><tr><th>github-com-michaelhabermas-ship-shape</th><td><span class="badge warn">strong candidate</span><div class="score">9 / 12</div></td><td>initial path only</td><td>structured_ledger_with_artifact_pointers</td><td>Artifact math supports the initial-load/code-splitting path, while total bundle does not pass.</td></tr>
-<tr><th>labs-gauntletai-com-daltondinderman-shipshape</th><td><span class="badge warn">strong candidate</span><div class="score">9 / 12</div></td><td>initial path only</td><td>before_after_bundle_json_with_delta_markdown</td><td>Artifact math supports the initial-load/code-splitting path, while total bundle does not pass.</td></tr>
-<tr><th>labs-gauntletai-com-shivkanthalu-ship</th><td><span class="badge warn">review candidate</span><div class="score">7 / 12</div></td><td>both paths reported</td><td>markdown_bundle_report_with_progressive_measurements</td><td>Markdown-reported math supports a passing path, but raw bundle artifacts or reruns are still needed.</td></tr></tbody>
+        <tbody><tr><th>github-com-michaelhabermas-ship-shape</th><td><span class='badge warn'>strong candidate</span><div class='score'>9 / 12</div></td><td>initial path only</td><td>structured_ledger_with_artifact_pointers</td><td>Artifact math supports the initial-load/code-splitting path, while total bundle does not pass.</td></tr>
+<tr><th>labs-gauntletai-com-daltondinderman-shipshape</th><td><span class='badge warn'>strong candidate</span><div class='score'>9 / 12</div></td><td>one path passes</td><td>before_after_bundle_json_with_delta_markdown</td><td>Artifact math supports the initial-load/code-splitting path, while total bundle does not pass.</td></tr>
+<tr><th>labs-gauntletai-com-shivkanthalu-ship</th><td><span class='badge warn'>review candidate</span><div class='score'>7 / 12</div></td><td>one path passes</td><td>markdown_bundle_report_with_progressive_measurements</td><td>Markdown-reported math supports a passing path, but raw bundle artifacts or reruns are still needed.</td></tr></tbody>
       </table>
 
       <h2 style="margin-top:22px">Why Those Ratings</h2>
       <table>
         <thead><tr><th>Dimension</th><th>github-com-michaelhabermas-ship-shape</th><th>labs-gauntletai-com-daltondinderman-shipshape</th><th>labs-gauntletai-com-shivkanthalu-ship</th></tr></thead>
-        <tbody><tr><th>Does extracted math satisfy an allowed spec path?</th><td><div class="meter"><i style="width:100.0%"></i></div><strong>3</strong></td><td><div class="meter"><i style="width:100.0%"></i></div><strong>3</strong></td><td><div class="meter"><i style="width:100.0%"></i></div><strong>3</strong></td></tr>
-<tr><th>Is the measurement backed by raw artifacts, or only prose?</th><td><div class="meter"><i style="width:100.0%"></i></div><strong>3</strong></td><td><div class="meter"><i style="width:100.0%"></i></div><strong>3</strong></td><td><div class="meter"><i style="width:33.33333333333333%"></i></div><strong>1</strong></td></tr>
-<tr><th>Does the repo make the claimed path explicit?</th><td><div class="meter"><i style="width:100.0%"></i></div><strong>2</strong></td><td><div class="meter"><i style="width:100.0%"></i></div><strong>2</strong></td><td><div class="meter"><i style="width:100.0%"></i></div><strong>2</strong></td></tr>
-<tr><th>Can before/after plausibly be compared?</th><td><div class="meter"><i style="width:100%"></i></div><strong>1</strong></td><td><div class="meter"><i style="width:100%"></i></div><strong>1</strong></td><td><div class="meter"><i style="width:100%"></i></div><strong>1</strong></td></tr>
-<tr><th>Has the harness rerun it from a clean clone?</th><td><div class="meter"><i style="width:0%"></i></div><strong>0</strong></td><td><div class="meter"><i style="width:0%"></i></div><strong>0</strong></td><td><div class="meter"><i style="width:0%"></i></div><strong>0</strong></td></tr></tbody>
+        <tbody><tr><th>Does extracted math satisfy an allowed spec path?</th><td><div class='meter'><i style='width:100.0%'></i></div><strong>3</strong></td><td><div class='meter'><i style='width:100.0%'></i></div><strong>3</strong></td><td><div class='meter'><i style='width:100.0%'></i></div><strong>3</strong></td></tr>
+<tr><th>Is the measurement backed by raw artifacts, or only prose?</th><td><div class='meter'><i style='width:100.0%'></i></div><strong>3</strong></td><td><div class='meter'><i style='width:100.0%'></i></div><strong>3</strong></td><td><div class='meter'><i style='width:33.33333333333333%'></i></div><strong>1</strong></td></tr>
+<tr><th>Does the repo make the claimed path explicit?</th><td><div class='meter'><i style='width:100.0%'></i></div><strong>2</strong></td><td><div class='meter'><i style='width:100.0%'></i></div><strong>2</strong></td><td><div class='meter'><i style='width:100.0%'></i></div><strong>2</strong></td></tr>
+<tr><th>Can before/after plausibly be compared?</th><td><div class='meter'><i style='width:100%'></i></div><strong>1</strong></td><td><div class='meter'><i style='width:100%'></i></div><strong>1</strong></td><td><div class='meter'><i style='width:100%'></i></div><strong>1</strong></td></tr>
+<tr><th>Has the harness rerun it from a clean clone?</th><td><div class='meter'><i style='width:0%'></i></div><strong>0</strong></td><td><div class='meter'><i style='width:0%'></i></div><strong>0</strong></td><td><div class='meter'><i style='width:0%'></i></div><strong>0</strong></td></tr></tbody>
       </table>
     </section>
 
@@ -99,7 +99,7 @@
       <div class="trace-grid">
         <div>
           <h4>Target Math</h4>
-          <table><thead><tr><th>Path</th><th>Before</th><th>After</th><th>Reduction</th><th>State</th></tr></thead><tbody><tr><th>total-production-bundle</th><td>2262.65</td><td>2369.69</td><td>-4.73</td><td><span class="badge warn">fails_artifact_math</span></td></tr><tr><th>initial-load-code-splitting</th><td>2025.1</td><td>528.48</td><td>73.9</td><td><span class="badge warn">passes_artifact_math</span></td></tr></tbody></table>
+          <table><thead><tr><th>Path</th><th>Before</th><th>After</th><th>Reduction</th><th>State</th></tr></thead><tbody><tr><th>total-production-bundle</th><td>2262.65</td><td>2369.69</td><td>-4.73</td><td><span class='badge warn'>fails_artifact_math</span></td></tr><tr><th>initial-load-code-splitting</th><td>2025.1</td><td>528.48</td><td>73.9</td><td><span class='badge warn'>passes_artifact_math</span></td></tr></tbody></table>
         </div>
         <div>
           <h4>Discovery Counts</h4>
@@ -107,7 +107,7 @@
         </div>
       </div>
       <h4>Judgment States</h4>
-      <table><tbody><tr><th>claim_found</th><td><span class="badge warn">yes</span></td><td>Structured claim exists in submission ledger.</td></tr><tr><th>artifact_backed</th><td><span class="badge warn">yes</span></td><td>Ledger points to baseline and latest bundle JSON artifacts.</td></tr><tr><th>machine_readable_before_after</th><td><span class="badge warn">yes</span></td><td>Raw KB values are extractable without reading prose.</td></tr><tr><th>path_choice_explicit</th><td><span class="badge warn">yes</span></td><td>Claim explicitly says initial-load/code-splitting, not total bundle.</td></tr><tr><th>independently_reproduced</th><td><span class="badge warn">no</span></td><td>Harness has not rerun pnpm build:web or the collector.</td></tr><tr><th>comparability</th><td><span class="badge warn">needs_agent_review</span></td><td>Baseline is report-extracted; latest is collector-extracted. Need command/environment confirmation.</td></tr></tbody></table>
+      <table><tbody><tr><th>claim_found</th><td><span class='badge warn'>yes</span></td><td>Structured claim exists in submission ledger.</td></tr><tr><th>artifact_backed</th><td><span class='badge warn'>yes</span></td><td>Ledger points to baseline and latest bundle JSON artifacts.</td></tr><tr><th>machine_readable_before_after</th><td><span class='badge warn'>yes</span></td><td>Raw KB values are extractable without reading prose.</td></tr><tr><th>path_choice_explicit</th><td><span class='badge warn'>yes</span></td><td>Claim explicitly says initial-load/code-splitting, not total bundle.</td></tr><tr><th>independently_reproduced</th><td><span class='badge warn'>no</span></td><td>Harness has not rerun pnpm build:web or the collector.</td></tr><tr><th>comparability</th><td><span class='badge warn'>needs_agent_review</span></td><td>Baseline is report-extracted; latest is collector-extracted. Need command/environment confirmation.</td></tr><tr><th>independent_reproduction</th><td><span class='badge warn'>verified</span></td><td>Harness measured (bundle-michael-repro-2.json).</td></tr></tbody></table>
     </article>
     
 
@@ -117,7 +117,7 @@
       <div class="trace-grid">
         <div>
           <h4>Target Math</h4>
-          <table><thead><tr><th>Path</th><th>Before</th><th>After</th><th>Reduction</th><th>State</th></tr></thead><tbody><tr><th>total-production-bundle</th><td>3961.46</td><td>3988.5</td><td>-0.68</td><td><span class="badge warn">fails_artifact_math</span></td></tr><tr><th>initial-load-code-splitting</th><td>2050.51</td><td>285.77</td><td>86.06</td><td><span class="badge warn">passes_artifact_math</span></td></tr></tbody></table>
+          <table><thead><tr><th>Path</th><th>Before</th><th>After</th><th>Reduction</th><th>State</th></tr></thead><tbody><tr><th>total-production-bundle</th><td>3961.46</td><td>3988.5</td><td>-0.68</td><td><span class='badge warn'>fails_verified_harness</span></td></tr><tr><th>initial-load-code-splitting</th><td>2050.51</td><td>285.77</td><td>86.06</td><td><span class='badge warn'>passes_verified_harness</span></td></tr></tbody></table>
         </div>
         <div>
           <h4>Discovery Counts</h4>
@@ -125,7 +125,7 @@
         </div>
       </div>
       <h4>Judgment States</h4>
-      <table><tbody><tr><th>claim_found</th><td><span class="badge warn">yes</span></td><td>Delta markdown declares pass/fail target and before/after result.</td></tr><tr><th>artifact_backed</th><td><span class="badge warn">yes</span></td><td>Before and after bundle JSON artifacts exist.</td></tr><tr><th>machine_readable_before_after</th><td><span class="badge warn">yes</span></td><td>Raw KB values are extractable from JSON.</td></tr><tr><th>path_choice_explicit</th><td><span class="badge warn">yes</span></td><td>Delta says total dist failed but initial JS passed.</td></tr><tr><th>independently_reproduced</th><td><span class="badge warn">no</span></td><td>Harness has not rerun the measurement script.</td></tr><tr><th>comparability</th><td><span class="badge warn">plausible_not_verified</span></td><td>Both artifacts share the same script shape and timestamps two minutes apart, but build inputs still need confirmation.</td></tr></tbody></table>
+      <table><tbody><tr><th>claim_found</th><td><span class='badge warn'>yes</span></td><td>Delta markdown declares pass/fail target and before/after result.</td></tr><tr><th>artifact_backed</th><td><span class='badge warn'>yes</span></td><td>Before and after bundle JSON artifacts exist.</td></tr><tr><th>machine_readable_before_after</th><td><span class='badge warn'>yes</span></td><td>Raw KB values are extractable from JSON.</td></tr><tr><th>path_choice_explicit</th><td><span class='badge warn'>yes</span></td><td>Delta says total dist failed but initial JS passed.</td></tr><tr><th>independently_reproduced</th><td><span class='badge warn'>no</span></td><td>Harness has not rerun the measurement script.</td></tr><tr><th>comparability</th><td><span class='badge warn'>plausible_not_verified</span></td><td>Both artifacts share the same script shape and timestamps two minutes apart, but build inputs still need confirmation.</td></tr><tr><th>independent_reproduction</th><td><span class='badge warn'>verified</span></td><td>Harness production build + dist measurement (bundle-dalton-replay.json).</td></tr></tbody></table>
     </article>
     
 
@@ -135,7 +135,7 @@
       <div class="trace-grid">
         <div>
           <h4>Target Math</h4>
-          <table><thead><tr><th>Path</th><th>Before</th><th>After</th><th>Reduction</th><th>State</th></tr></thead><tbody><tr><th>total-production-bundle</th><td>4403.2</td><td>3072.0</td><td>30.23</td><td><span class="badge warn">passes_markdown_math</span></td></tr><tr><th>initial-load-code-splitting</th><td>589.0</td><td>92.9</td><td>84.23</td><td><span class="badge warn">passes_markdown_math</span></td></tr></tbody></table>
+          <table><thead><tr><th>Path</th><th>Before</th><th>After</th><th>Reduction</th><th>State</th></tr></thead><tbody><tr><th>total-production-bundle</th><td>4403.2</td><td>3072.0</td><td>30.23</td><td><span class='badge warn'>passes_verified_harness</span></td></tr><tr><th>initial-load-code-splitting</th><td>589.0</td><td>92.9</td><td>84.23</td><td><span class='badge warn'>passes_verified_harness</span></td></tr></tbody></table>
         </div>
         <div>
           <h4>Discovery Counts</h4>
@@ -143,7 +143,7 @@
         </div>
       </div>
       <h4>Judgment States</h4>
-      <table><tbody><tr><th>claim_found</th><td><span class="badge warn">yes</span></td><td>Category 2 Markdown report makes explicit before/after bundle claims.</td></tr><tr><th>artifact_backed</th><td><span class="badge warn">markdown_backed</span></td><td>The report includes methodology and tables, but no recognized before/after bundle JSON was found.</td></tr><tr><th>machine_readable_before_after</th><td><span class="badge warn">no</span></td><td>Raw values came from Markdown parsing, not JSON artifacts.</td></tr><tr><th>path_choice_explicit</th><td><span class="badge warn">yes</span></td><td>Report claims both total dist reduction and initial JS reduction.</td></tr><tr><th>measurements_over_time</th><td><span class="badge warn">yes</span></td><td>Report includes Pass 1 through Pass 4 progressive metrics.</td></tr><tr><th>independently_reproduced</th><td><span class="badge warn">no</span></td><td>Harness has not rerun the stated build or treemap commands.</td></tr><tr><th>comparability</th><td><span class="badge warn">needs_agent_review</span></td><td>Need to verify baseline/current commits, stats.html exclusion, compression basis, and functionality preservation.</td></tr></tbody></table>
+      <table><tbody><tr><th>claim_found</th><td><span class='badge warn'>yes</span></td><td>Category 2 Markdown report makes explicit before/after bundle claims.</td></tr><tr><th>artifact_backed</th><td><span class='badge warn'>markdown_backed</span></td><td>The report includes methodology and tables, but no recognized before/after bundle JSON was found.</td></tr><tr><th>machine_readable_before_after</th><td><span class='badge warn'>no</span></td><td>Raw values came from Markdown parsing, not JSON artifacts.</td></tr><tr><th>path_choice_explicit</th><td><span class='badge warn'>yes</span></td><td>Report claims both total dist reduction and initial JS reduction.</td></tr><tr><th>measurements_over_time</th><td><span class='badge warn'>yes</span></td><td>Report includes Pass 1 through Pass 4 progressive metrics.</td></tr><tr><th>independently_reproduced</th><td><span class='badge warn'>no</span></td><td>Harness has not rerun the stated build or treemap commands.</td></tr><tr><th>comparability</th><td><span class='badge warn'>needs_agent_review</span></td><td>Need to verify baseline/current commits, stats.html exclusion, compression basis, and functionality preservation.</td></tr><tr><th>independent_reproduction</th><td><span class='badge warn'>verified</span></td><td>Harness production build + dist measurement (bundle-shiv-replay.json).</td></tr></tbody></table>
     </article>
     
     </section>
@@ -224,10 +224,10 @@
 
     <section id="next" class="tab">
       <h2>Recommended Next Tabs / Capabilities</h2>
-      <div class="experiments"><article class="experiment"><h3>Markdown claim compiler</h3><strong>Do this next.</strong><p>Shiv&#x27;s repo shows the common case: the evidence is in Markdown tables. The harness needs to extract claims from prose, then downgrade trust until raw artifacts or reruns exist.</p></article>
-<article class="experiment"><h3>Clean-clone bundle rerunner</h3><strong>Do after claim compiler.</strong><p>All three are currently not reproduced. This is the first thing that turns evidence review into benchmark measurement.</p></article>
-<article class="experiment"><h3>Comparability verifier</h3><strong>Build as a judgment agent prompt plus deterministic checks.</strong><p>The hard question is not only whether numbers changed. It is whether baseline/current use the same command, output scope, compression basis, and functionality.</p></article>
-<article class="experiment"><h3>Noise reducer</h3><strong>Keep lightweight for now.</strong><p>Discovery counts are too large. We need to classify copied specs, public duplicates, generated evidence bundles, and source-of-truth reports.</p></article></div>
+      <div class="experiments"><article class='experiment'><h3>Markdown claim compiler</h3><strong>Do this next.</strong><p>Shiv&#x27;s repo shows the common case: the evidence is in Markdown tables. The harness needs to extract claims from prose, then downgrade trust until raw artifacts or reruns exist.</p></article>
+<article class='experiment'><h3>Clean-clone bundle rerunner</h3><strong>Do after claim compiler.</strong><p>All three are currently not reproduced. This is the first thing that turns evidence review into benchmark measurement.</p></article>
+<article class='experiment'><h3>Comparability verifier</h3><strong>Build as a judgment agent prompt plus deterministic checks.</strong><p>The hard question is not only whether numbers changed. It is whether baseline/current use the same command, output scope, compression basis, and functionality.</p></article>
+<article class='experiment'><h3>Noise reducer</h3><strong>Keep lightweight for now.</strong><p>Discovery counts are too large. We need to classify copied specs, public duplicates, generated evidence bundles, and source-of-truth reports.</p></article></div>
     </section>
   </main>
   <script>

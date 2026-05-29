@@ -118,8 +118,10 @@
         },
         {
           "id": "fixes_meaningful",
-          "state": "needs_review",
-          "note": "Across-the-board reduction lowers superficiality risk, but narrowing quality unverified."
+          "state": "pass",
+          "note": "JUDGMENT (not measurement): The type-safety fixes appear MEANINGFUL, not superficial. Evidence: (a) non-null assertions were replaced with a genuine narrowing helper getAuthenticatedRouteContext/getAuthenticatedUserContext that throws on missing req.userId/workspaceId \u2014 0 `req.userId!`/`req.workspaceId!` remain in production routes; (b) DB boundaries are typed via pool.query<RowType>() (414 occurr",
+          "trust": "artifact_backed",
+          "artifact": "typesafety-gate-michael.json"
         },
         {
           "id": "counting_comparable",
@@ -297,6 +299,13 @@
             "note": "self-report rejected \u2014 verified count diverges materially"
           }
         }
+      },
+      "qualitative_gate": {
+        "artifact": "typesafety-gate-michael.json",
+        "completed_at": "2026-05-28T22:14:22Z",
+        "confidence": "medium",
+        "judgment_excerpt": "JUDGMENT (not measurement): The type-safety fixes appear MEANINGFUL, not superficial. Evidence: (a) non-null assertions were replaced with a genuine narrowing helper getAuthenticatedRouteContext/getAuthenticatedUserContext that throws on missing req.userId/workspaceId \u2014 0 `req.userId!`/`req.workspaceId!` remain in production routes; (b) DB boundaries are typed via pool.query<RowType>() (414 occurrences) and request bodies validated via Zod safeParse (19 route files), i.e. real narrowing rather t",
+        "replay_outcome": null
       }
     },
     {
@@ -605,7 +614,9 @@
         {
           "id": "fixes_meaningful",
           "state": "needs_review",
-          "note": "1,219 -> 0 in one pass is the highest superficiality risk in the cohort."
+          "note": "JUDGMENT (not measurement): The remediation is PARTIALLY meaningful, and the headline claim is overstated. MEANINGFUL: `any` elimination is genuine (AST any=0) backed by typed row interfaces and 456 typed pool.query<T>() boundaries; non-null elimination is genuine and well-designed (Express Request.userId/workspaceId made non-optional with a documented middleware guarantee; 0 req.userId!/req.works",
+          "trust": "verified",
+          "artifact": "typesafety-gate-shiv-replay-v2.json"
         },
         {
           "id": "counting_comparable",
@@ -784,6 +795,13 @@
             "note": "self-report rejected \u2014 verified count diverges materially"
           }
         }
+      },
+      "qualitative_gate": {
+        "artifact": "typesafety-gate-shiv-replay-v2.json",
+        "completed_at": "2026-05-29T14:36:31Z",
+        "confidence": "high",
+        "judgment_excerpt": "JUDGMENT (not measurement): The remediation is PARTIALLY meaningful, and the headline claim is overstated. MEANINGFUL: `any` elimination is genuine (AST any=0) backed by typed row interfaces and 456 typed pool.query<T>() boundaries; non-null elimination is genuine and well-designed (Express Request.userId/workspaceId made non-optional with a documented middleware guarantee; 0 req.userId!/req.workspaceId! remain, only 1 nonnull total). SUPERFICIAL/UNSUPPORTED: the claim that all 619 `as` casts we",
+        "replay_outcome": "succeeded"
       }
     }
   ],

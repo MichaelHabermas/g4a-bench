@@ -67,13 +67,13 @@
         "instrument": "Hybrid yardstick: (1) cohort TypeScript AST counts via g4a-harness/ts_violation_counter.js on api/src,web/src,shared/src excluding tests (or repo's own AST counter if equivalent); (2) judgment protocol \u2014 sample fix patterns in production code (any\u2192typed, as casts, non-null, as-unknown-as, Zod/typed DB boundaries); (3) pnpm type-check across packages if available. Adapt paths to repo; do not trust ESLint-only or markdown-only counts.",
         "method_rationale": "This is a QUALITATIVE gate, not a count. The repo is a single squashed commit (baseline sha 5731a92 is absent from history), so per-line before/after diffs are not available. The strongest available evidence of meaningfulness is therefore the current code's typing patterns plus a clean strict-mode type-check (which proves any-removals were not silently re-broken). I used the toolchain's own type-checker as ground truth rather than trusting the ledger.",
         "definitions": {
-          "ast_scope": "api/src, web/src, shared/src \u2014 production only (exclude tests) unless spec says otherwise",
-          "ast_tool": "node g4a-harness/ts_violation_counter.js <repo> api/src,web/src,shared/src",
+          "ast_scope": "api/src, web/src, shared/src \u2014 production only (exclude tests)",
+          "ast_tool": "node /harness/ts_violation_counter.js /repo api/src,web/src,shared/src",
           "judgment_gate": "Meaningful vs superficial fixes per spec; label as judgment with confidence",
           "functionality": "type-check pass is necessary not sufficient; note if tests not run"
         },
         "commands": [
-          "node g4a-harness/ts_violation_counter.js /repo api/src,web/src,shared/src",
+          "node /harness/ts_violation_counter.js /repo api/src,web/src,shared/src",
           "grep samples: as unknown as, req.userId!, .query<, safeParse in production src",
           "pnpm --filter @ship/* run type-check (or repo equivalent)"
         ],
@@ -98,6 +98,16 @@
           "definitions": {
             "ast_scope": "api/src, web/src, shared/src \u2014 production only (exclude tests) unless spec says otherwise",
             "ast_tool": "node g4a-harness/ts_violation_counter.js <repo> api/src,web/src,shared/src",
+            "judgment_gate": "Meaningful vs superficial fixes per spec; label as judgment with confidence",
+            "functionality": "type-check pass is necessary not sufficient; note if tests not run"
+          }
+        },
+        {
+          "at": "2026-05-29T00:05:10Z",
+          "note": "AST tool path -> /harness mount inside Docker sandbox",
+          "definitions": {
+            "ast_scope": "api/src, web/src, shared/src \u2014 production only (exclude tests)",
+            "ast_tool": "node /harness/ts_violation_counter.js /repo api/src,web/src,shared/src",
             "judgment_gate": "Meaningful vs superficial fixes per spec; label as judgment with confidence",
             "functionality": "type-check pass is necessary not sufficient; note if tests not run"
           }

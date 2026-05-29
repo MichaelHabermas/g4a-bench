@@ -33,7 +33,7 @@
     },
     {
       "id": "independent-reproduction",
-      "output": "This prototype has not rerun builds. It can only mark artifact-backed, not independently verified.",
+      "output": "Harness has rebuilt production bundles and measured dist for some or all repos.",
       "question": "Has the harness reproduced the measurement?"
     }
   ],
@@ -359,6 +359,11 @@
           "name": "comparability",
           "note": "Baseline is report-extracted; latest is collector-extracted. Need command/environment confirmation.",
           "value": "needs_agent_review"
+        },
+        {
+          "name": "independent_reproduction",
+          "value": "verified",
+          "note": "Harness measured (bundle-michael-repro-2.json)."
         }
       ],
       "next_judgments": [
@@ -541,7 +546,13 @@
         }
       ],
       "team": "github-com-michaelhabermas-ship-shape",
-      "team_shape": "structured_ledger_with_artifact_pointers"
+      "team_shape": "structured_ledger_with_artifact_pointers",
+      "harness_measurement": {
+        "artifact": "bundle-michael-repro-2.json",
+        "completed_at": "2026-05-28T22:10:47Z",
+        "confidence": "high",
+        "replay_outcome": null
+      }
     },
     {
       "agent_questions": [
@@ -1303,6 +1314,11 @@
           "name": "comparability",
           "note": "Both artifacts share the same script shape and timestamps two minutes apart, but build inputs still need confirmation.",
           "value": "plausible_not_verified"
+        },
+        {
+          "name": "independent_reproduction",
+          "value": "verified",
+          "note": "Harness production build + dist measurement (bundle-dalton-replay.json)."
         }
       ],
       "next_judgments": [
@@ -1481,7 +1497,17 @@
           "interpretation": "Comparable only if both totals use the same production output scope.",
           "reduction_percent": -0.68,
           "spec_threshold": ">= 15% reduction",
-          "state": "fails_artifact_math"
+          "state": "fails_verified_harness",
+          "verified": {
+            "after_kb": 2454.19,
+            "claimed_after_kb": 3988.5,
+            "artifact": "bundle-dalton-replay.json",
+            "method": "Replayed cohort yardstick `cat-2-bundle`: clean `pnpm install --frozen-lockfile`, then production build `pnpm run build:web` (tsc + vite build). Measured web/dist output with find/stat/du. Identified the initial-load (entry) chunk authorita",
+            "confidence": "high",
+            "replay_outcome": "succeeded",
+            "flagged": true,
+            "discrepancy_kb": -1534.31
+          }
         },
         {
           "after_kb": 285.77,
@@ -1490,11 +1516,27 @@
           "interpretation": "Valid only if the reduction came from code splitting/lazy loading without removing functionality.",
           "reduction_percent": 86.06,
           "spec_threshold": ">= 20% reduction",
-          "state": "passes_artifact_math"
+          "state": "passes_verified_harness",
+          "verified": {
+            "after_kb": 285.96,
+            "claimed_after_kb": 285.77,
+            "artifact": "bundle-dalton-replay.json",
+            "method": "Replayed cohort yardstick `cat-2-bundle`: clean `pnpm install --frozen-lockfile`, then production build `pnpm run build:web` (tsc + vite build). Measured web/dist output with find/stat/du. Identified the initial-load (entry) chunk authorita",
+            "confidence": "high",
+            "replay_outcome": "succeeded",
+            "flagged": false,
+            "discrepancy_kb": 0.19
+          }
         }
       ],
       "team": "labs-gauntletai-com-daltondinderman-shipshape",
-      "team_shape": "before_after_bundle_json_with_delta_markdown"
+      "team_shape": "before_after_bundle_json_with_delta_markdown",
+      "harness_measurement": {
+        "artifact": "bundle-dalton-replay.json",
+        "completed_at": "2026-05-28T23:11:29Z",
+        "confidence": "high",
+        "replay_outcome": "succeeded"
+      }
     },
     {
       "agent_questions": [
@@ -1614,6 +1656,11 @@
           "name": "comparability",
           "note": "Need to verify baseline/current commits, stats.html exclusion, compression basis, and functionality preservation.",
           "value": "needs_agent_review"
+        },
+        {
+          "name": "independent_reproduction",
+          "value": "verified",
+          "note": "Harness production build + dist measurement (bundle-shiv-replay.json)."
         }
       ],
       "next_judgments": [
@@ -1745,7 +1792,17 @@
           "interpretation": "Comparable only if both totals use the same production output scope. Values are extracted from Markdown, not raw bundle artifacts.",
           "reduction_percent": 30.23,
           "spec_threshold": ">= 15% reduction",
-          "state": "passes_markdown_math"
+          "state": "passes_verified_harness",
+          "verified": {
+            "after_kb": 1873.49,
+            "claimed_after_kb": 3072.0,
+            "artifact": "bundle-shiv-replay.json",
+            "method": "Replayed the cohort yardstick (cat-2-bundle): clean `pnpm install --frozen-lockfile`, then production build via repo's own `pnpm run build:web` (tsc + vite 6.4.1/Rollup). Measured dist output at web/dist using find -printf '%s' sums, du -sh",
+            "confidence": "high",
+            "replay_outcome": "succeeded",
+            "flagged": true,
+            "discrepancy_kb": -1198.51
+          }
         },
         {
           "after_kb": 92.9,
@@ -1754,11 +1811,27 @@
           "interpretation": "Valid only if the reduction came from code splitting/lazy loading without removing functionality. Values are extracted from Markdown, not raw bundle artifacts.",
           "reduction_percent": 84.23,
           "spec_threshold": ">= 20% reduction",
-          "state": "passes_markdown_math"
+          "state": "passes_verified_harness",
+          "verified": {
+            "after_kb": 286.73,
+            "claimed_after_kb": 92.9,
+            "artifact": "bundle-shiv-replay.json",
+            "method": "Replayed the cohort yardstick (cat-2-bundle): clean `pnpm install --frozen-lockfile`, then production build via repo's own `pnpm run build:web` (tsc + vite 6.4.1/Rollup). Measured dist output at web/dist using find -printf '%s' sums, du -sh",
+            "confidence": "high",
+            "replay_outcome": "succeeded",
+            "flagged": true,
+            "discrepancy_kb": 193.83
+          }
         }
       ],
       "team": "labs-gauntletai-com-shivkanthalu-ship",
-      "team_shape": "markdown_bundle_report_with_progressive_measurements"
+      "team_shape": "markdown_bundle_report_with_progressive_measurements",
+      "harness_measurement": {
+        "artifact": "bundle-shiv-replay.json",
+        "completed_at": "2026-05-28T23:14:13Z",
+        "confidence": "high",
+        "replay_outcome": "succeeded"
+      }
     }
   ]
 }

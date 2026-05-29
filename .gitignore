@@ -18,3 +18,7 @@ htmlcov/
 .idea/
 .vscode/
 *.log
+.yardstick/
+.turbo/
+playwright-report/
+test-results/

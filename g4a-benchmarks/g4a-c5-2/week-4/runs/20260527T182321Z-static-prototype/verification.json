@@ -1,6 +1,6 @@
 {
   "verified_state": "after_only",
-  "baseline_gap": "Verified % reduction not computed \u2014 a common baseline (original ShipShape) has not been independently counted. Recorded, not faked.",
+  "baseline_gap": "Verified % reduction not computed — a common baseline (original ShipShape) has not been independently counted. Recorded, not faked.",
   "records": [
     {
       "team": "github-com-michaelhabermas-ship-shape",
@@ -9,12 +9,12 @@
         {
           "method": "regex grep",
           "verdict": "rejected",
-          "why": "Counts `import { X as Y }` aliases as casts. Measured here: crude `as` ~956 vs real 284 for one repo \u2014 unusable for the `as` metric."
+          "why": "Counts `import { X as Y }` aliases as casts. Measured here: crude `as` ~956 vs real 284 for one repo — unusable for the `as` metric."
         },
         {
           "method": "team's ESLint output",
           "verdict": "rejected",
-          "why": "Self-reported, and `consistent-type-assertions` flags only a narrow subset of `as` usages \u2014 not the spec's 'type assertions (as)'."
+          "why": "Self-reported, and `consistent-type-assertions` flags only a narrow subset of `as` usages — not the spec's 'type assertions (as)'."
         },
         {
           "method": "typescript compiler AST",
@@ -23,54 +23,9 @@
         }
       ],
       "chosen_method": "typescript compiler AST",
-      "held_loosely": "Count is syntactic \u2014 cannot judge whether a remaining cast is justified or a removed `any` was genuinely narrowed. Revisit with a type-aware (full-program) pass or a diff-based superficiality method.",
-      "status": "verified",
-      "tool": {
-        "name": "typescript-ast",
-        "ts_version": "5.9.3",
-        "scope": [
-          "api/src",
-          "web/src",
-          "shared/src"
-        ],
-        "files": 408
-      },
-      "verified_remaining": {
-        "any": 12,
-        "as": 284,
-        "nonnull": 37,
-        "total": 333
-      },
-      "checks": {
-        "any": {
-          "verified": 12,
-          "claimed_after": 1,
-          "flagged": false,
-          "discrepancy": 11,
-          "note": "self-report roughly consistent with verified count"
-        },
-        "as": {
-          "verified": 284,
-          "claimed_after": 372,
-          "flagged": true,
-          "discrepancy": -88,
-          "note": "self-report rejected \u2014 verified count diverges materially"
-        },
-        "nonnull": {
-          "verified": 37,
-          "claimed_after": 36,
-          "flagged": false,
-          "discrepancy": 1,
-          "note": "self-report roughly consistent with verified count"
-        },
-        "total": {
-          "verified": 333,
-          "claimed_after": 409,
-          "flagged": true,
-          "discrepancy": -76,
-          "note": "self-report rejected \u2014 verified count diverges materially"
-        }
-      }
+      "held_loosely": "Count is syntactic — cannot judge whether a remaining cast is justified or a removed `any` was genuinely narrowed. Revisit with a type-aware (full-program) pass or a diff-based superficiality method.",
+      "status": "clone_unavailable",
+      "note": "No clone at /private/tmp/g4a-bench-prototype/g4a-c5-2/week-4/20260527T182321Z-static-prototype/20260527T182321Z-static-prototype/github-com-michaelhabermas-ship-shape; cannot verify, self-report stands but remains unverified."
     },
     {
       "team": "labs-gauntletai-com-daltondinderman-shipshape",
@@ -79,12 +34,12 @@
         {
           "method": "regex grep",
           "verdict": "rejected",
-          "why": "Counts `import { X as Y }` aliases as casts. Measured here: crude `as` ~956 vs real 284 for one repo \u2014 unusable for the `as` metric."
+          "why": "Counts `import { X as Y }` aliases as casts. Measured here: crude `as` ~956 vs real 284 for one repo — unusable for the `as` metric."
         },
         {
           "method": "team's ESLint output",
           "verdict": "rejected",
-          "why": "Self-reported, and `consistent-type-assertions` flags only a narrow subset of `as` usages \u2014 not the spec's 'type assertions (as)'."
+          "why": "Self-reported, and `consistent-type-assertions` flags only a narrow subset of `as` usages — not the spec's 'type assertions (as)'."
         },
         {
           "method": "typescript compiler AST",
@@ -93,54 +48,9 @@
         }
       ],
       "chosen_method": "typescript compiler AST",
-      "held_loosely": "Count is syntactic \u2014 cannot judge whether a remaining cast is justified or a removed `any` was genuinely narrowed. Revisit with a type-aware (full-program) pass or a diff-based superficiality method.",
-      "status": "verified",
-      "tool": {
-        "name": "typescript-ast",
-        "ts_version": "5.9.3",
-        "scope": [
-          "api/src",
-          "web/src",
-          "shared/src"
-        ],
-        "files": 287
-      },
-      "verified_remaining": {
-        "any": 66,
-        "as": 451,
-        "nonnull": 47,
-        "total": 564
-      },
-      "checks": {
-        "any": {
-          "verified": 66,
-          "claimed_after": 66,
-          "flagged": false,
-          "discrepancy": 0,
-          "note": "self-report roughly consistent with verified count"
-        },
-        "as": {
-          "verified": 451,
-          "claimed_after": 504,
-          "flagged": false,
-          "discrepancy": -53,
-          "note": "self-report roughly consistent with verified count"
-        },
-        "nonnull": {
-          "verified": 47,
-          "claimed_after": 46,
-          "flagged": false,
-          "discrepancy": 1,
-          "note": "self-report roughly consistent with verified count"
-        },
-        "total": {
-          "verified": 564,
-          "claimed_after": 616,
-          "flagged": false,
-          "discrepancy": -52,
-          "note": "self-report roughly consistent with verified count"
-        }
-      }
+      "held_loosely": "Count is syntactic — cannot judge whether a remaining cast is justified or a removed `any` was genuinely narrowed. Revisit with a type-aware (full-program) pass or a diff-based superficiality method.",
+      "status": "clone_unavailable",
+      "note": "No clone at /private/tmp/g4a-bench-prototype/g4a-c5-2/week-4/20260527T182321Z-static-prototype/20260527T182321Z-static-prototype/labs-gauntletai-com-daltondinderman-shipshape; cannot verify, self-report stands but remains unverified."
     },
     {
       "team": "labs-gauntletai-com-shivkanthalu-ship",
@@ -149,12 +59,12 @@
         {
           "method": "regex grep",
           "verdict": "rejected",
-          "why": "Counts `import { X as Y }` aliases as casts. Measured here: crude `as` ~956 vs real 284 for one repo \u2014 unusable for the `as` metric."
+          "why": "Counts `import { X as Y }` aliases as casts. Measured here: crude `as` ~956 vs real 284 for one repo — unusable for the `as` metric."
         },
         {
           "method": "team's ESLint output",
           "verdict": "rejected",
-          "why": "Self-reported, and `consistent-type-assertions` flags only a narrow subset of `as` usages \u2014 not the spec's 'type assertions (as)'."
+          "why": "Self-reported, and `consistent-type-assertions` flags only a narrow subset of `as` usages — not the spec's 'type assertions (as)'."
         },
         {
           "method": "typescript compiler AST",
@@ -163,54 +73,9 @@
         }
       ],
       "chosen_method": "typescript compiler AST",
-      "held_loosely": "Count is syntactic \u2014 cannot judge whether a remaining cast is justified or a removed `any` was genuinely narrowed. Revisit with a type-aware (full-program) pass or a diff-based superficiality method.",
-      "status": "verified",
-      "tool": {
-        "name": "typescript-ast",
-        "ts_version": "5.9.3",
-        "scope": [
-          "api/src",
-          "web/src",
-          "shared/src"
-        ],
-        "files": 292
-      },
-      "verified_remaining": {
-        "any": 0,
-        "as": 628,
-        "nonnull": 1,
-        "total": 629
-      },
-      "checks": {
-        "any": {
-          "verified": 0,
-          "claimed_after": 0,
-          "flagged": false,
-          "discrepancy": 0,
-          "note": "self-report roughly consistent with verified count"
-        },
-        "as": {
-          "verified": 628,
-          "claimed_after": 0,
-          "flagged": true,
-          "discrepancy": 628,
-          "note": "self-report rejected \u2014 verified count diverges materially"
-        },
-        "nonnull": {
-          "verified": 1,
-          "claimed_after": 0,
-          "flagged": false,
-          "discrepancy": 1,
-          "note": "self-report roughly consistent with verified count"
-        },
-        "total": {
-          "verified": 629,
-          "claimed_after": 0,
-          "flagged": true,
-          "discrepancy": 629,
-          "note": "self-report rejected \u2014 verified count diverges materially"
-        }
-      }
+      "held_loosely": "Count is syntactic — cannot judge whether a remaining cast is justified or a removed `any` was genuinely narrowed. Revisit with a type-aware (full-program) pass or a diff-based superficiality method.",
+      "status": "clone_unavailable",
+      "note": "No clone at /private/tmp/g4a-bench-prototype/g4a-c5-2/week-4/20260527T182321Z-static-prototype/20260527T182321Z-static-prototype/labs-gauntletai-com-shivkanthalu-ship; cannot verify, self-report stands but remains unverified."
     }
   ]
 }

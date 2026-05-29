@@ -1,0 +1,16 @@
+{
+  "name": "@yardstick/llm",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "eslint src"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.54.0"
+  }
+}

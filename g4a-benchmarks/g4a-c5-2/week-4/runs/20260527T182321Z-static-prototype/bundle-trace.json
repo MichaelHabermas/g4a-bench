@@ -40,7 +40,7 @@
   "run_dir": "/Users/michaelhabermas/repos/GAI/g4a-bench/g4a-benchmarks/g4a-c5-2/week-4/runs/20260527T182321Z-static-prototype",
   "run_id": "20260527T182321Z-static-prototype",
   "scope_note": "This is a generalized evaluator trace pointed at bundle size. It is not a bundle-size product and it is not a final score.",
-  "spec_excerpt": "Category 2: Bundle Size\n\nWhat you are measuring: The size of the production frontend bundle. Large bundles slow down initial\npage load, hurt performance on slow networks, and waste bandwidth. You are looking for oversized\ndependencies, missing code splitting, unused imports, and opportunities to reduce what the browser has\nto download.\n\nHow to Measure\n   \u2022    Build the production frontend and record the total output size\n   \u2022    Use a bundle visualization tool (e.g., rollup-plugin-visualizer, vite-bundle-analyzer, or\n        source-map-explorer) to generate a treemap of the bundle\n   \u2022    Identify the largest chunks and the largest individual dependencies within them\n\n   \u2022   Check for unused dependencies: cross-reference package.json dependencies against actual\n       imports in the source code\n   \u2022   Evaluate whether code splitting is in use and where lazy loading could reduce initial load\n\nAudit Deliverable\n\n Metric                                          Your Baseline\n Total production bundle size                    ___ KB\n Largest chunk                                   ___ (name + size)\n Number of chunks                                ___\n Top 3 largest dependencies                      List with sizes\n Unused dependencies identified                  List\n\nImprovement Target\n15% reduction in total production bundle size, or implement code splitting that reduces initial\npage load bundle by 20%. Provide before/after bundle analysis output. Removing functionality to shrink\nthe bundle does not count.",
+  "spec_excerpt": "Category 2: Bundle Size\n\nWhat you are measuring: The size of the production frontend bundle. Large bundles slow down initial\npage load, hurt performance on slow networks, and waste bandwidth. You are looking for oversized\ndependencies, missing code splitting, unused imports, and opportunities to reduce what the browser has\nto download.\n\nHow to Measure\n   •    Build the production frontend and record the total output size\n   •    Use a bundle visualization tool (e.g., rollup-plugin-visualizer, vite-bundle-analyzer, or\n        source-map-explorer) to generate a treemap of the bundle\n   •    Identify the largest chunks and the largest individual dependencies within them\n\n   •   Check for unused dependencies: cross-reference package.json dependencies against actual\n       imports in the source code\n   •   Evaluate whether code splitting is in use and where lazy loading could reduce initial load\n\nAudit Deliverable\n\n Metric                                          Your Baseline\n Total production bundle size                    ___ KB\n Largest chunk                                   ___ (name + size)\n Number of chunks                                ___\n Top 3 largest dependencies                      List with sizes\n Unused dependencies identified                  List\n\nImprovement Target\n15% reduction in total production bundle size, or implement code splitting that reduces initial\npage load bundle by 20%. Provide before/after bundle analysis output. Removing functionality to shrink\nthe bundle does not count.",
   "spec_source": "g4a-specs/g4a-c5-2/week-4/GFA-Week-4-ShipShape.txt",
   "teams": [
     {
@@ -363,7 +363,7 @@
         {
           "name": "independent_reproduction",
           "value": "verified",
-          "note": "Harness measured (bundle-michael-repro-2.json)."
+          "note": "Harness production build + dist measurement (bundle-michael-repro-2.json)."
         }
       ],
       "next_judgments": [
@@ -550,8 +550,7 @@
       "harness_measurement": {
         "artifact": "bundle-michael-repro-2.json",
         "completed_at": "2026-05-28T22:10:47Z",
-        "confidence": "high",
-        "replay_outcome": null
+        "confidence": "high"
       }
     },
     {
@@ -1553,11 +1552,11 @@
         "Progressive pass history is useful process signal, but it can also hide cherry-picking unless rerun from clean baseline/current commits."
       ],
       "claim_text": [
-        "This audit measured the size of JavaScript delivered to users on first page load and the total production build output. The baseline shipped a single 589 KB gzip JavaScript chunk to every visitor \u2014 including users who only needed a login page. Through route-level code splitting, vendor chunk separation, lazy-loaded heavy dependencies, and removal of a production devtools leak, the initial JS payload dropped to 92.90 KB gzip \u2014 an 84% reduction that exceeds the GFA 20% target by a wide margin. Both GFA targets are met: initial JS payload is 92.90 KB gzip (\u221284% vs 589 KB baseline) and total `dist/` is 3.0 MB (\u221230% vs 4.3 MB baseline, below the 3.65 MB target). The 4.1 MB figure from the mid-pass audit snapshot included the 735 KB `stats.html` treemap artifact before it was made opt-in.",
-        "This audit measured the size of JavaScript delivered to users on first page load and the total production build output. The baseline shipped a single 589 KB gzip JavaScript chunk to every visitor \u2014 including users who only needed a login page. Through route-level code splitting, vendor chunk separation, lazy-loaded heavy dependencies, and removal of a production devtools leak, the initial JS payload dropped to 92.90 KB gzip \u2014 an 84% reduction that exceeds the GFA 20% target by a wide margin. Both GFA targets are met: initial JS payload is 92.90 KB gzip (\u221284% vs 589 KB baseline) and total `dist/` is 3.0 MB (\u221230% vs 4.3 MB baseline, below the 3.65 MB target). The 4.1 MB figure from the mid-pass audit snapshot included the 735 KB `stats.html` treemap artifact before it was made opt-in.",
-        "| Initial JS (HTML-preloaded, gzip) | \u2264 471 KB (\u221220%) | 589 KB | 92.90 KB | \u2705 |",
-        "| Total `dist/` size | \u2264 3.65 MB (\u221215%) | 4.3 MB | 3.0 MB | \u2705 |",
-        "These are code-split, on-demand modules \u2014 they do not affect the initial route payload. Both GFA targets are met: initial-load JS \u221284% and total `dist/` \u221230%."
+        "This audit measured the size of JavaScript delivered to users on first page load and the total production build output. The baseline shipped a single 589 KB gzip JavaScript chunk to every visitor — including users who only needed a login page. Through route-level code splitting, vendor chunk separation, lazy-loaded heavy dependencies, and removal of a production devtools leak, the initial JS payload dropped to 92.90 KB gzip — an 84% reduction that exceeds the GFA 20% target by a wide margin. Both GFA targets are met: initial JS payload is 92.90 KB gzip (−84% vs 589 KB baseline) and total `dist/` is 3.0 MB (−30% vs 4.3 MB baseline, below the 3.65 MB target). The 4.1 MB figure from the mid-pass audit snapshot included the 735 KB `stats.html` treemap artifact before it was made opt-in.",
+        "This audit measured the size of JavaScript delivered to users on first page load and the total production build output. The baseline shipped a single 589 KB gzip JavaScript chunk to every visitor — including users who only needed a login page. Through route-level code splitting, vendor chunk separation, lazy-loaded heavy dependencies, and removal of a production devtools leak, the initial JS payload dropped to 92.90 KB gzip — an 84% reduction that exceeds the GFA 20% target by a wide margin. Both GFA targets are met: initial JS payload is 92.90 KB gzip (−84% vs 589 KB baseline) and total `dist/` is 3.0 MB (−30% vs 4.3 MB baseline, below the 3.65 MB target). The 4.1 MB figure from the mid-pass audit snapshot included the 735 KB `stats.html` treemap artifact before it was made opt-in.",
+        "| Initial JS (HTML-preloaded, gzip) | ≤ 471 KB (−20%) | 589 KB | 92.90 KB | ✅ |",
+        "| Total `dist/` size | ≤ 3.65 MB (−15%) | 4.3 MB | 3.0 MB | ✅ |",
+        "These are code-split, on-demand modules — they do not affect the initial route payload. Both GFA targets are met: initial-load JS −84% and total `dist/` −30%."
       ],
       "commit_sha": "6f74ef8d5883e68b2f1597358d6171fa07d58faf",
       "discovery_inventory": {
@@ -1574,7 +1573,7 @@
           "api/src/db/migrations/036_fix_audit_and_comments_fks.sql",
           "api/src/services/audit.ts",
           "docs/audit/GFA - Security Audit.md",
-          "docs/audit/GFA ShipShape \u2014 Kickoff.pdf",
+          "docs/audit/GFA ShipShape — Kickoff.pdf",
           "docs/audit/GFA Week 4 - ShipShape.pdf",
           "docs/audit/README.md",
           "docs/audit/ai-cost-analysis.md",
@@ -1701,11 +1700,11 @@
       },
       "raw_metrics": {
         "initial_js_gzip_kb_after": 92.9,
-        "initial_js_gzip_kb_before": 589.0,
+        "initial_js_gzip_kb_before": 589,
         "reported_measurement_command": "pnpm build:shared && pnpm --filter @ship/web build",
         "reported_route_lazy_count": "15 routes lazy",
         "reported_treemap_command": "ANALYZE_BUNDLE=true pnpm build:web",
-        "total_dist_kb_after_from_markdown_mb": 3072.0,
+        "total_dist_kb_after_from_markdown_mb": 3072,
         "total_dist_kb_before_from_markdown_mb": 4403.2
       },
       "repo_path": "/private/tmp/g4a-bench-prototype/g4a-c5-2/week-4/20260527T182321Z-static-prototype/labs-gauntletai-com-shivkanthalu-ship",
@@ -1786,7 +1785,7 @@
       ],
       "target_paths": [
         {
-          "after_kb": 3072.0,
+          "after_kb": 3072,
           "before_kb": 4403.2,
           "id": "total-production-bundle",
           "interpretation": "Comparable only if both totals use the same production output scope. Values are extracted from Markdown, not raw bundle artifacts.",
@@ -1795,7 +1794,7 @@
           "state": "passes_verified_harness",
           "verified": {
             "after_kb": 1873.49,
-            "claimed_after_kb": 3072.0,
+            "claimed_after_kb": 3072,
             "artifact": "bundle-shiv-replay.json",
             "method": "Replayed the cohort yardstick (cat-2-bundle): clean `pnpm install --frozen-lockfile`, then production build via repo's own `pnpm run build:web` (tsc + vite 6.4.1/Rollup). Measured dist output at web/dist using find -printf '%s' sums, du -sh",
             "confidence": "high",
@@ -1806,7 +1805,7 @@
         },
         {
           "after_kb": 92.9,
-          "before_kb": 589.0,
+          "before_kb": 589,
           "id": "initial-load-code-splitting",
           "interpretation": "Valid only if the reduction came from code splitting/lazy loading without removing functionality. Values are extracted from Markdown, not raw bundle artifacts.",
           "reduction_percent": 84.23,

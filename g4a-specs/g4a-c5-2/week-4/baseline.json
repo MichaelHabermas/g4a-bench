@@ -1,0 +1,4 @@
+{
+  "upstream_repo_url": "https://github.com/MichaelHabermas/ship-shape",
+  "ref_policy": "first-commit"
+}

@@ -21,4 +21,15 @@ Layout under each folder: `{cohort}/week-{n}/` (e.g. `g4a-c5-2/week-4/`).
 3. Score and rank against **that week’s** criteria only.
 4. Publish outcomes under `g4a-benchmarks/`.
 
-Benchmark harness and automation are still to come; the repo is set up so specs, repos, and results stay in separate, obvious places. More detail on results layout: `[g4a-benchmarks/README.md](g4a-benchmarks/README.md)`.
+## Yardstick (measurement platform)
+
+The **Yardstick** app lives at the repo root (`apps/web`, `apps/server`, `packages/*`). It supersedes the Python prototype in [`g4a-harness/`](g4a-harness/) over time — that folder remains as a guidepost and hybrid agent bridge.
+
+```bash
+pnpm install
+pnpm dev
+```
+
+See [`docs/yardstick/`](docs/yardstick/) for architecture and data model. Local-only for now; `.env` keys: `ANTHROPIC_API_KEY`, `LANGFUSE_*` (optional), `DATABASE_PATH`.
+
+Legacy static prototype runs remain under `g4a-benchmarks/`. More detail: [`g4a-benchmarks/README.md`](g4a-benchmarks/README.md).

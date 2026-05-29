@@ -1,0 +1,19 @@
+{
+  "name": "@yardstick/observability",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "eslint src"
+  },
+  "dependencies": {
+    "langfuse": "^3.37.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.21"
+  }
+}

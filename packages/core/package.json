@@ -1,0 +1,28 @@
+{
+  "name": "@yardstick/core",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./paths": "./src/paths.ts",
+    "./sync": "./src/sync/index.ts",
+    "./scorecard": "./src/scorecard/index.ts",
+    "./yardstick": "./src/yardstick/index.ts",
+    "./baseline": "./src/baseline/index.ts",
+    "./verify": "./src/verify/typesafety.ts",
+    "./schemas": "./src/schemas/index.ts"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "eslint src"
+  },
+  "dependencies": {
+    "zod": "^3.25.36"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.21",
+    "vitest": "^3.2.1"
+  }
+}

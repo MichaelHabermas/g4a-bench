@@ -23,8 +23,15 @@ disciplines that keep results trustworthy and comparable. Method choice is
 recorded per run (held loosely), never codified into this file.
 
 Run for real:   ANTHROPIC_API_KEY=... python3 agent_runner.py \
-                    --criterion-file <spec.txt> --repo <clone> --run-dir <dir>
+                    --criterion-id cat-2-bundle --criterion-file <spec.txt> \
+                    --repo <clone> --run-dir <dir>
 Validate wiring (no key, no API call):   add --dry-run
+
+Cohort memory: with --criterion-id, the run reads/writes run-dir/yardsticks.json.
+First repo establishes the yardstick; later repos replay it first, then may challenge.
+Instrument yardsticks (AST, build+stat) replay commands; judgment yardsticks
+(qualitative gates, browser/Playwright) replay an inspection protocol — not identical
+scores, but the same rubric and evidence bar.
 """
 
 from __future__ import annotations
@@ -38,6 +45,18 @@ import time
 import uuid
 from pathlib import Path
 from typing import Any
+
+_HARNESS_DIR = Path(__file__).resolve().parent
+if str(_HARNESS_DIR) not in sys.path:
+    sys.path.insert(0, str(_HARNESS_DIR))
+
+from yardstick_memory import (
+    build_yardstick_user_section,
+    load_yardstick,
+    log_challenge,
+    promote_if_first,
+    seed_from_measurement_artifact,
+)
 
 # Load g4a-harness/.env so the system carries its own key (no shell export needed).
 try:
@@ -91,6 +110,22 @@ Disciplines (do not violate):
     * "could_not_measure"— blocked; report the blocker and the evidence.
   Always report `confidence` and `what_would_raise_confidence`.
 
+Two kinds of yardstick (often combined in one criterion):
+- INSTRUMENT — compiler/build/counter tools. Replay the same commands; numbers \
+  should be reproducible. Example: TypeScript AST counts, dist byte sizes.
+- JUDGMENT — qualitative gates and "look at it" inspection. Replay the same \
+  protocol and rubric, not the same numeric outcome. Example: "meaningful vs \
+  superficial fixes", Playwright UX passes, accessibility spot-checks. Be \
+  explicit about what you looked at, what you couldn't see, and your confidence.
+
+When a cohort yardstick is provided, work in phases:
+1. REPLAY the frozen yardstick on this repo first.
+2. CHALLENGE only within reason — if replay failed, confidence is low, or a \
+   listed revisit condition applies. Compare alternatives; do not silently replace \
+   the cohort yardstick.
+3. SUBMIT with `run_mode`: establish (first repo), replay (yardstick worked), or \
+   challenge (you propose something better — it is logged, not auto-adopted).
+
 When you are done (measured, estimated, or blocked), you MUST call \
 `submit_measurement` exactly once with your structured result. Do not finish by \
 writing prose alone — the run only completes when you call that tool.\
@@ -135,8 +170,29 @@ SUBMIT_TOOL = {
             "what_would_raise_confidence": {"type": "string", "description": "What you'd need to move this to a confident, verified measurement."},
             "held_loosely": {"type": "string", "description": "What would make a better method next time."},
             "commands_summary": {"type": "string", "description": "The key commands you ran to produce the numbers."},
+            "run_mode": {
+                "type": "string",
+                "enum": ["establish", "replay", "challenge"],
+                "description": "establish=first cohort yardstick; replay=followed frozen yardstick; challenge=proposed alternative.",
+            },
+            "replay_outcome": {
+                "type": "string",
+                "enum": ["succeeded", "failed", "partial", "not_applicable"],
+                "description": "How the replay phase went (not_applicable for establish).",
+            },
+            "yardstick_update_proposed": {
+                "type": "boolean",
+                "description": "True if you believe a better cohort-wide yardstick exists (challenge mode).",
+            },
+            "yardstick_update_rationale": {
+                "type": "string",
+                "description": "Why a proposed yardstick is better for comparability (challenge mode).",
+            },
         },
-        "required": ["status", "method", "method_rationale", "verified_values", "confidence", "what_would_raise_confidence"],
+        "required": [
+            "status", "method", "method_rationale", "verified_values", "confidence",
+            "what_would_raise_confidence", "run_mode", "replay_outcome",
+        ],
     },
 }
 
@@ -211,14 +267,27 @@ def truncate(text: str) -> str:
 # Agent loop
 # ---------------------------------------------------------------------------
 
-def build_user_message(criterion: str, repo: Path, self_report: str | None) -> str:
+def build_user_message(
+    criterion: str,
+    repo: Path,
+    self_report: str | None,
+    criterion_id: str | None,
+    run_dir: Path | None,
+) -> str:
     parts = [
         "## Criterion to measure\n", criterion.strip(), "\n\n",
         f"## Repo\nThe clone is the sandbox working directory (/repo). Path on host: {repo}\n",
     ]
     if self_report:
         parts += ["\n## The team's self-reported result (verify, do not trust)\n", self_report.strip(), "\n"]
-    parts.append("\nInspect the repo, choose your method, measure, then call submit_measurement.")
+    if criterion_id and run_dir is not None:
+        yardstick = load_yardstick(run_dir, criterion_id)
+        parts.append(build_yardstick_user_section(criterion_id, yardstick))
+    else:
+        parts.append(
+            "\nInspect the repo, choose your method, measure, then call submit_measurement "
+            "with run_mode=establish.\n"
+        )
     return "".join(parts)
 
 
@@ -234,14 +303,21 @@ def assemble_request(user_message: str) -> dict[str, Any]:
     }
 
 
-def run_agent(criterion: str, repo: Path, run_dir: Path, sandbox_kind: str,
-              self_report: str | None, max_steps: int) -> dict[str, Any]:
+def run_agent(
+    criterion: str,
+    repo: Path,
+    run_dir: Path,
+    sandbox_kind: str,
+    self_report: str | None,
+    max_steps: int,
+    criterion_id: str | None,
+) -> dict[str, Any]:
     import anthropic  # imported here so --dry-run works without the SDK installed
 
     client = anthropic.Anthropic()  # reads ANTHROPIC_API_KEY
     sandbox = DockerSandbox(repo) if sandbox_kind == "docker" else LocalSandbox(repo)
     transcript: list[dict[str, Any]] = []
-    base = assemble_request(build_user_message(criterion, repo, self_report))
+    base = assemble_request(build_user_message(criterion, repo, self_report, criterion_id, run_dir))
     messages = base["messages"]
     result: dict[str, Any] | None = None
 
@@ -281,13 +357,21 @@ def run_agent(criterion: str, repo: Path, run_dir: Path, sandbox_kind: str,
     finally:
         sandbox.stop()
 
+    final_result = result or {
+        "status": "could_not_measure",
+        "method": "n/a",
+        "note": "agent did not submit a measurement",
+        "run_mode": "establish" if criterion_id and not load_yardstick(run_dir, criterion_id) else "replay",
+        "replay_outcome": "not_applicable",
+    }
     return {
+        "criterion_id": criterion_id,
         "criterion_excerpt": criterion.strip()[:280],
         "repo": str(repo),
         "model": MODEL,
         "sandbox": sandbox_kind,
         "steps_used": len(transcript),
-        "result": result or {"status": "could_not_measure", "method": "n/a", "note": "agent did not submit a measurement"},
+        "result": final_result,
         "transcript": transcript,
         "completed_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
     }
@@ -303,6 +387,15 @@ def main() -> int:
     p.add_argument("--sandbox", choices=["docker", "none"], default="docker")
     p.add_argument("--max-steps", type=int, default=MAX_STEPS)
     p.add_argument("--out-name", default=None, help="Output filename under run-dir/agent-measurements/")
+    p.add_argument(
+        "--criterion-id",
+        help="Stable id for cohort yardstick memory (e.g. cat-2-bundle, cat-1-typesafety-gate)",
+    )
+    p.add_argument(
+        "--seed-yardstick-from",
+        type=Path,
+        help="Promote an existing agent-measurements/*.json into yardsticks.json before running",
+    )
     p.add_argument("--dry-run", action="store_true", help="Assemble and print the request; no API call, no key needed")
     args = p.parse_args()
 
@@ -310,28 +403,65 @@ def main() -> int:
     if not criterion:
         raise SystemExit("Provide --criterion or --criterion-file")
 
+    if args.seed_yardstick_from:
+        if not args.criterion_id:
+            raise SystemExit("--seed-yardstick-from requires --criterion-id")
+        seed_from_measurement_artifact(args.run_dir, args.criterion_id, args.seed_yardstick_from)
+
     if args.dry_run:
-        req = assemble_request(build_user_message(criterion, args.repo, args.self_report))
+        req = assemble_request(
+            build_user_message(criterion, args.repo, args.self_report, args.criterion_id, args.run_dir)
+        )
         preview = {
             "model": req["model"], "thinking": req["thinking"], "output_config": req["output_config"],
             "system_chars": len(req["system"][0]["text"]), "system_cached": True,
             "tools": [t["name"] for t in req["tools"]],
             "first_user_message": req["messages"][0]["content"],
             "sandbox": args.sandbox, "repo_exists": args.repo.exists(),
+            "criterion_id": args.criterion_id,
+            "yardstick_exists": bool(
+                args.criterion_id and load_yardstick(args.run_dir, args.criterion_id)
+            ),
             "ANTHROPIC_API_KEY_set": bool(os.environ.get("ANTHROPIC_API_KEY")),
         }
         print(json.dumps(preview, indent=2))
         return 0
 
-    record = run_agent(criterion, args.repo, args.run_dir, args.sandbox, args.self_report, args.max_steps)
+    record = run_agent(
+        criterion, args.repo, args.run_dir, args.sandbox, args.self_report,
+        args.max_steps, args.criterion_id,
+    )
     out_dir = args.run_dir / "agent-measurements"
     out_dir.mkdir(parents=True, exist_ok=True)
     name = args.out_name or f"measurement-{uuid.uuid4().hex[:8]}.json"
     out_path = out_dir / name
     out_path.write_text(json.dumps(record, indent=2), encoding="utf-8")
-    # Append a one-line entry to the run ledger for diffing over time.
+
+    result = record["result"]
+    run_mode = result.get("run_mode", "establish")
+    yardstick_ref = args.criterion_id
+    promoted = None
+    if args.criterion_id:
+        if run_mode == "establish":
+            promoted = promote_if_first(
+                args.run_dir, args.criterion_id, criterion, result, name, "establish",
+            )
+        if run_mode == "challenge" or result.get("yardstick_update_proposed"):
+            log_challenge(args.run_dir, args.criterion_id, result, name)
+
+    ledger_entry = {
+        "repo": str(args.repo),
+        "criterion_id": args.criterion_id,
+        "run_mode": run_mode,
+        "replay_outcome": result.get("replay_outcome"),
+        "yardstick_ref": yardstick_ref,
+        "yardstick_promoted": promoted is not None,
+        "result": result,
+        "at": record["completed_at"],
+        "artifact": str(out_path),
+    }
     with (args.run_dir / "ledger.jsonl").open("a", encoding="utf-8") as fh:
-        fh.write(json.dumps({"repo": str(args.repo), "result": record["result"], "at": record["completed_at"], "artifact": str(out_path)}) + "\n")
+        fh.write(json.dumps(ledger_entry) + "\n")
     print(out_path)
     return 0
 

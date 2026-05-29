@@ -1,0 +1,109 @@
+{
+  "version": 1,
+  "yardsticks": {
+    "cat-2-bundle": {
+      "criterion_id": "cat-2-bundle",
+      "kind": "instrument",
+      "established_at": "2026-05-28T22:25:15Z",
+      "established_from": "bundle-michael.json",
+      "yardstick": {
+        "instrument": "Clean pnpm install (--frozen-lockfile), then production build via the repo's `pnpm run build:web` (or equivalent). Measure web/dist with find/stat (apparent bytes). Parse web/dist/index.html as ground truth for initial load: every <script type=\"module\" src=...> plus every <link rel=\"modulepreload\" href=...> plus the entry <link rel=\"stylesheet\">. Sum those asset byte sizes (and gzip -9 per file when reporting transfer size). Do not use single-chunk proxy or counterfactual rebuilds for cohort ranking.",
+        "method_rationale": "Vite is the build tool (web/package.json build = `tsc && vite build`). The deterministic, toolchain-native artifact is the dist/ folder and its index.html, which is the same yardstick usable for any Vite frontend. Byte sizes from the OS (stat/find/du) are ground truth rather than the team's collector script.",
+        "definitions": {
+          "dist_path": "web/dist (adapt if the frontend package differs)",
+          "initial_load_js": "Sum of raw bytes for all JS referenced for first paint in index.html: module script(s) + modulepreload link(s). Shiv-style preloads count.",
+          "initial_load_js_css": "initial_load_js plus entry stylesheet href from index.html",
+          "total_js_css": "find-sum of all *.js + *.css under dist (apparent bytes, not du blocks)",
+          "total_dist_apparent": "find-sum of all files under dist (apparent bytes)",
+          "total_dist_du": "du -sh block size \u2014 report for cross-check only; inflates with many tiny chunks",
+          "gzip": "gzip -9 -c per initial-load JS file, summed (transfer-size proxy)",
+          "baseline_pct": "Do not certify reduction % without a reproducible pre-change build/commit; measure and rank after-state under pinned definitions"
+        },
+        "commands": [
+          "pnpm install --frozen-lockfile",
+          "pnpm run build:web",
+          "grep -oE 'src=\"/assets/[^\"]+\\.js\"|href=\"/assets/[^\"]+\\.(js|css)\"' web/dist/index.html",
+          "grep modulepreload web/dist/index.html",
+          "stat -c%s on each initial-load asset; optional gzip -9 -c | wc -c per JS file",
+          "find web/dist \\( -name '*.js' -o -name '*.css' \\) -printf '%s\\n' | awk sum",
+          "find web/dist -type f -printf '%s\\n' | awk sum",
+          "find web/dist/assets -name '*.js' | wc -l"
+        ],
+        "inspection_protocol": "",
+        "judgment_rubric": "",
+        "evidence_requirements": [
+          "Numbers must trace to commands run in the sandbox."
+        ]
+      },
+      "revisit_if": [
+        "Repo lacks pnpm build:web \u2014 adapt to equivalent production frontend build script only if replay fails",
+        "index.html uses SSR or inline scripts with no module tags \u2014 challenge with comparability argument",
+        "No pre-change baseline in clone \u2014 report after-state only; do not invent counterfactual builds"
+      ],
+      "alternatives_considered": [],
+      "definition_history": [
+        {
+          "at": "2026-05-28T23:26:36Z",
+          "note": "Pinned after Michael/Dalton/Shiv replay: initial load includes modulepreload; total uses apparent find-sum",
+          "definitions": {
+            "dist_path": "web/dist (adapt if the frontend package differs)",
+            "initial_load_js": "Sum of raw bytes for all JS referenced for first paint in index.html: module script(s) + modulepreload link(s). Shiv-style preloads count.",
+            "initial_load_js_css": "initial_load_js plus entry stylesheet href from index.html",
+            "total_js_css": "find-sum of all *.js + *.css under dist (apparent bytes, not du blocks)",
+            "total_dist_apparent": "find-sum of all files under dist (apparent bytes)",
+            "total_dist_du": "du -sh block size \u2014 report for cross-check only; inflates with many tiny chunks",
+            "gzip": "gzip -9 -c per initial-load JS file, summed (transfer-size proxy)",
+            "baseline_pct": "Do not certify reduction % without a reproducible pre-change build/commit; measure and rank after-state under pinned definitions"
+          }
+        }
+      ]
+    },
+    "cat-1-typesafety-gate": {
+      "criterion_id": "cat-1-typesafety-gate",
+      "kind": "hybrid",
+      "established_at": "2026-05-28T22:25:18Z",
+      "established_from": "typesafety-gate-michael.json",
+      "yardstick": {
+        "instrument": "Hybrid yardstick: (1) cohort TypeScript AST counts via g4a-harness/ts_violation_counter.js on api/src,web/src,shared/src excluding tests (or repo's own AST counter if equivalent); (2) judgment protocol \u2014 sample fix patterns in production code (any\u2192typed, as casts, non-null, as-unknown-as, Zod/typed DB boundaries); (3) pnpm type-check across packages if available. Adapt paths to repo; do not trust ESLint-only or markdown-only counts.",
+        "method_rationale": "This is a QUALITATIVE gate, not a count. The repo is a single squashed commit (baseline sha 5731a92 is absent from history), so per-line before/after diffs are not available. The strongest available evidence of meaningfulness is therefore the current code's typing patterns plus a clean strict-mode type-check (which proves any-removals were not silently re-broken). I used the toolchain's own type-checker as ground truth rather than trusting the ledger.",
+        "definitions": {
+          "ast_scope": "api/src, web/src, shared/src \u2014 production only (exclude tests) unless spec says otherwise",
+          "ast_tool": "node g4a-harness/ts_violation_counter.js <repo> api/src,web/src,shared/src",
+          "judgment_gate": "Meaningful vs superficial fixes per spec; label as judgment with confidence",
+          "functionality": "type-check pass is necessary not sufficient; note if tests not run"
+        },
+        "commands": [
+          "node g4a-harness/ts_violation_counter.js /repo api/src,web/src,shared/src",
+          "grep samples: as unknown as, req.userId!, .query<, safeParse in production src",
+          "pnpm --filter @ship/* run type-check (or repo equivalent)"
+        ],
+        "inspection_protocol": "Qualitative gate assessment of type-safety fix quality, grounded in: (1) the repo's own TypeScript AST counter (scripts/type-safety-counts.mjs) re-run at HEAD to verify remaining-violation counts vs the committed baseline (my-docs/evidence/cat1-baseline-ast-counts-5731a92.json); (2) static inspection of the actual fix patterns in current code (auth-context helper, typed pool.query<T>(), Zod safeParse boundaries, `as unknown as` double-cast prevalence); (3) running `tsc --noEmit` type-check across all three packages as the cheap functionality/correctness gate; (4) cross-referencing AUDIT_REPORT.md / IMPROVEMENT_REPORT.md / submission-ledger.json claims.",
+        "judgment_rubric": "JUDGMENT (not measurement): The type-safety fixes appear MEANINGFUL, not superficial. Evidence: (a) non-null assertions were replaced with a genuine narrowing helper getAuthenticatedRouteContext/getAuthenticatedUserContext that throws on missing req.userId/workspaceId \u2014 0 `req.userId!`/`req.workspaceId!` remain in production routes; (b) DB boundaries are typed via pool.query<RowType>() (414 occurrences) and request bodies validated via Zod safeParse (19 route files), i.e. real narrowing rather than blanket casts; (c) the lazy `as unknown as` double-cast escape hatch appears exactly ONCE in production code (api/src/routes/claude.ts), so the 'any\u2192unknown without narrowing' anti-pattern is NOT pervasive; (d) strict mode + noImplicitAny + noUncheckedIndexedAccess are enabled and `tsc --noEmit` passes cleanly in all three packages, so the large any reduction (94\u21921 prod) did not just move errors out of sight. Functionality at the type level is preserved (clean type-check). CAVEAT: I could not inspect line-by-line diffs of removed violations because history is squashed to a single commit and the baseline commit is absent; this judgment rests on current code state + type-check + documentation, not on the actual removed-line diffs, so I cannot rule out that some individual removals were cosmetic.",
+        "evidence_requirements": [
+          "Label conclusions as judgment, not measurement.",
+          "State confidence and what would raise it.",
+          "Say I don't know rather than invent numbers.",
+          "Numbers must trace to commands run in the sandbox."
+        ]
+      },
+      "revisit_if": [
+        "A better method would compare the exact list of removed violation sites (file:line:snippet) between baseline and HEAD and classify each as meaningful/superficial. That requires either the team's per-violation baseline dump (the committed baseline JSON only has aggregate counts) or the original commit. Revisit if either becomes available.",
+        "Blocker encountered: Repo history is a single squashed commit and the baseline commit (5731a92) is not present, so per-line before/after fix diffs cannot be inspected. Full test suite not run (requires a Postgres test database); functionality verified only via "
+      ],
+      "alternatives_considered": [],
+      "definition_history": [
+        {
+          "at": "2026-05-28T23:26:36Z",
+          "note": "Generalized for Shiv replay: harness AST counter + judgment protocol",
+          "definitions": {
+            "ast_scope": "api/src, web/src, shared/src \u2014 production only (exclude tests) unless spec says otherwise",
+            "ast_tool": "node g4a-harness/ts_violation_counter.js <repo> api/src,web/src,shared/src",
+            "judgment_gate": "Meaningful vs superficial fixes per spec; label as judgment with confidence",
+            "functionality": "type-check pass is necessary not sufficient; note if tests not run"
+          }
+        }
+      ]
+    }
+  },
+  "pending_updates": []
+}

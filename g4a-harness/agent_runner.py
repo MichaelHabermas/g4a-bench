@@ -66,7 +66,7 @@ try:
 except ImportError:
     pass
 
-MODEL = "claude-opus-4-8"
+MODEL = os.environ.get("AGENT_MODEL", "claude-opus-4-8")
 MAX_STEPS = 40
 MAX_TOOL_OUTPUT = 12000  # chars of bash output fed back per call
 

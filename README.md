@@ -30,6 +30,6 @@ pnpm install
 pnpm dev
 ```
 
-See [`docs/yardstick/`](docs/yardstick/) for architecture and data model. Local-only for now; `.env` keys: `ANTHROPIC_API_KEY`, `LANGFUSE_*` (optional), `DATABASE_PATH`.
+See [`docs/yardstick/`](docs/yardstick/) for architecture and data model. Copy [`.env.example`](.env.example) to `.env.local` — keys for LLM, Langfuse, clones, and dev chat are documented there.
 
 Legacy static prototype runs remain under `g4a-benchmarks/`. More detail: [`g4a-benchmarks/README.md`](g4a-benchmarks/README.md).

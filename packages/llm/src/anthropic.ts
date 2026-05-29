@@ -6,11 +6,11 @@ export class AnthropicProvider implements LlmProvider {
   private client: Anthropic;
   private defaultModel: string;
 
-  constructor(apiKey?: string, defaultModel = 'claude-sonnet-4-20250514') {
+  constructor(apiKey?: string, defaultModel?: string) {
     const key = apiKey ?? process.env.ANTHROPIC_API_KEY;
     if (!key) throw new Error('ANTHROPIC_API_KEY not configured');
     this.client = new Anthropic({ apiKey: key });
-    this.defaultModel = defaultModel;
+    this.defaultModel = defaultModel ?? process.env.ANTHROPIC_MODEL ?? 'claude-sonnet-4-20250514';
   }
 
   async complete(params: CompletionParams): Promise<CompletionResult> {
